@@ -205,6 +205,28 @@
             font-size: 28px;
         }
 
+        .controls-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .randomize-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .randomize-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
         .name-list {
             max-height: 300px;
             overflow-y: auto;
@@ -418,6 +440,9 @@
 
         <div class="control-panel">
             <h2>👥 Participants</h2>
+            <div class="controls-section">
+                <button class="randomize-button" onclick="randomizeOrder()">🔀 Mélanger l'ordre</button>
+            </div>
             <div class="name-list" id="nameList"></div>
             <div class="add-name-section">
                 <input type="text" class="add-name-input" id="newName" placeholder="Ajouter un nom..."
@@ -438,8 +463,25 @@
     <script>
         let names = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
         let activeNames = [...names];
+        let shuffledActiveNames = [...activeNames]; // Nouvelle variable pour l'ordre mélangé
         let isSpinning = false;
         let currentRotation = 0;
+
+        // Fonction pour mélanger un tableau (algorithme Fisher-Yates)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Fonction pour mélanger l'ordre des noms
+        function randomizeOrder() {
+            shuffledActiveNames = shuffleArray(activeNames);
+            drawWheel();
+        }
 
         // Générer des particules d'arrière-plan
         function createParticles() {
@@ -470,7 +512,7 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (activeNames.length === 0) {
+            if (shuffledActiveNames.length === 0) {
                 ctx.fillStyle = '#764ba2';
                 ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
@@ -478,9 +520,10 @@
                 return;
             }
 
-            const angleStep = (Math.PI * 2) / activeNames.length;
+            const angleStep = (Math.PI * 2) / shuffledActiveNames.length;
 
-            activeNames.forEach((name, index) => {
+            // Utilise shuffledActiveNames au lieu de activeNames
+            shuffledActiveNames.forEach((name, index) => {
                 const startAngle = index * angleStep - Math.PI / 2;
                 const endAngle = startAngle + angleStep;
 
@@ -558,6 +601,8 @@
             } else {
                 activeNames.push(name);
             }
+            // Mettre à jour shuffledActiveNames quand activeNames change
+            shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
         }
 
@@ -568,6 +613,8 @@
             if (name && !names.includes(name)) {
                 names.push(name);
                 activeNames.push(name);
+                // Mettre à jour shuffledActiveNames
+                shuffledActiveNames = shuffleArray(activeNames);
                 input.value = '';
                 updateNameList();
                 drawWheel();
@@ -575,7 +622,7 @@
         }
 
         function spin() {
-            if (isSpinning || activeNames.length === 0) return;
+            if (isSpinning || shuffledActiveNames.length === 0) return;
 
             isSpinning = true;
             document.getElementById('spinBtn').disabled = true;
@@ -588,14 +635,13 @@
 
             setTimeout(() => {
                 // Calculer le gagnant basé sur l'angle final
-                // La flèche pointe vers le haut (0°), donc on calcule par rapport à cette position
                 const finalAngle = currentRotation % 360;
-                const segmentAngle = 360 / activeNames.length;
+                const segmentAngle = 360 / shuffledActiveNames.length;
 
                 // Calcul corrigé : on inverse la rotation et on ajuste pour que la flèche soit à 0°
                 const normalizedAngle = (360 - finalAngle) % 360;
-                const winnerIndex = Math.floor(normalizedAngle / segmentAngle) % activeNames.length;
-                const winner = activeNames[winnerIndex];
+                const winnerIndex = Math.floor(normalizedAngle / segmentAngle) % shuffledActiveNames.length;
+                const winner = shuffledActiveNames[winnerIndex];
 
                 showWinner(winner);
                 createConfetti();
@@ -634,6 +680,8 @@
 
         // Initialisation
         createParticles();
+        // Mélanger l'ordre initial
+        shuffledActiveNames = shuffleArray(activeNames);
         drawWheel();
         updateNameList();
 
