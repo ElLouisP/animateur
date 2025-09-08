@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue de Sélection d'Animateur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Particules animées en arrière-plan */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .wheel-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+        }
+
+        /* Effet de halo lumineux */
+        .wheel-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Flèche indicatrice */
+        .pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid #FFD700;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+            z-index: 10;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* Bouton de lancement */
+        .spin-button {
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .spin-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover::before {
+            left: 100%;
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Panel de gestion des noms */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .name-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .name-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: all 0.3s;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .name-item.excluded {
+            background: #e0e0e0;
+            opacity: 0.6;
+        }
+
+        .name-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .name-item label {
+            flex: 1;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .name-item.excluded label {
+            color: #666;
+            text-decoration: line-through;
+        }
+
+        .add-name-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .add-name-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #764ba2;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .add-name-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .add-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .add-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Effet de confettis */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f39c12;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Modal de résultat */
+        .winner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .winner-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .winner-content h1 {
+            color: white;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .winner-name {
+            font-size: 64px;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 30px 0;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #ffd700, 0 0 30px #ffd700;
+            }
+
+            to {
+                text-shadow: 0 0 20px #fff, 0 0 30px #ffd700, 0 0 40px #ffd700;
+            }
+        }
+
+        .close-modal {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: white;
+            color: #764ba2;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="wheel-glow"></div>
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="450" height="450"></canvas>
+            </div>
+            <button class="spin-button" id="spinBtn" onclick="spin()">🎯 LANCER LA ROUE 🎯</button>
+        </div>
+
+        <div class="control-panel">
+            <h2>👥 Participants</h2>
+            <div class="name-list" id="nameList"></div>
+            <div class="add-name-section">
+                <input type="text" class="add-name-input" id="newName" placeholder="Ajouter un nom..."
+                    onkeypress="if(event.key==='Enter') addName()">
+                <button class="add-button" onclick="addName()">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="winner-modal" id="winnerModal">
+        <div class="winner-content">
+            <h1>🎉 L'animateur sera 🎉</h1>
+            <div class="winner-name" id="winnerName"></div>
+            <button class="close-modal" onclick="closeModal()">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        let names = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
+        let activeNames = [...names];
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // Générer des particules d'arrière-plan
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Couleurs vibrantes pour les segments
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#BB8FCE', '#85C1E2', '#F8B739', '#52D681'
+        ];
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 200;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (activeNames.length === 0) {
+                ctx.fillStyle = '#764ba2';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Ajoutez des participants!', centerX, centerY);
+                return;
+            }
+
+            const angleStep = (Math.PI * 2) / activeNames.length;
+
+            activeNames.forEach((name, index) => {
+                const startAngle = index * angleStep - Math.PI / 2;
+                const endAngle = startAngle + angleStep;
+
+                // Dessiner le segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                // Remplir avec la couleur
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+
+                // Ajouter une bordure blanche
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ajouter le texte
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + angleStep / 2);
+                ctx.textAlign = "center";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 18px Arial";
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.fillText(name, radius * 0.65, 0);
+                ctx.restore();
+            });
+
+            // Dessiner le cercle central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function updateNameList() {
+            const list = document.getElementById('nameList');
+            list.innerHTML = '';
+
+            names.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'name-item';
+                if (!activeNames.includes(name)) {
+                    item.classList.add('excluded');
+                }
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `name-${index}`;
+                checkbox.checked = activeNames.includes(name);
+                checkbox.onchange = () => toggleName(name);
+
+                const label = document.createElement('label');
+                label.htmlFor = `name-${index}`;
+                label.textContent = name;
+
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                list.appendChild(item);
+            });
+        }
+
+        function toggleName(name) {
+            const index = activeNames.indexOf(name);
+            if (index > -1) {
+                activeNames.splice(index, 1);
+            } else {
+                activeNames.push(name);
+            }
+            drawWheel();
+        }
+
+        function addName() {
+            const input = document.getElementById('newName');
+            const name = input.value.trim();
+
+            if (name && !names.includes(name)) {
+                names.push(name);
+                activeNames.push(name);
+                input.value = '';
+                updateNameList();
+                drawWheel();
+            }
+        }
+
+        function spin() {
+            if (isSpinning || activeNames.length === 0) return;
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+
+            const canvas = document.getElementById('wheelCanvas');
+            const spinAngle = Math.random() * 360 + 1440; // Au moins 4 tours
+            currentRotation += spinAngle;
+
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                // Calculer le gagnant basé sur l'angle final
+                // La flèche pointe vers le haut (0°), donc on calcule par rapport à cette position
+                const finalAngle = currentRotation % 360;
+                const segmentAngle = 360 / activeNames.length;
+
+                // Calcul corrigé : on inverse la rotation et on ajuste pour que la flèche soit à 0°
+                const normalizedAngle = (360 - finalAngle) % 360;
+                const winnerIndex = Math.floor(normalizedAngle / segmentAngle) % activeNames.length;
+                const winner = activeNames[winnerIndex];
+
+                showWinner(winner);
+                createConfetti();
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+            }, 4000);
+        }
+
+        function showWinner(name) {
+            const modal = document.getElementById('winnerModal');
+            const winnerName = document.getElementById('winnerName');
+            winnerName.textContent = name;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('winnerModal').style.display = 'none';
+        }
+
+        function createConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD'];
+
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3500);
+                }, i * 30);
+            }
+        }
+
+        // Initialisation
+        createParticles();
+        drawWheel();
+        updateNameList();
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.onclick = function (event) {
+            const modal = document.getElementById('winnerModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>
