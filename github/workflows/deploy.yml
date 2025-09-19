@@ -15,8 +15,8 @@ jobs:
     
     - name: Replace variables
       run: |
-        sed -i 's/\${{ vars.TOKEN_PLACEHOLDER }}/${{ vars.TOKEN_PLACEHOLDER }}/g' index.html
-        sed -i 's/\${{ vars.GIST_ID }}/${{ vars.GIST_ID }}/g' index.html
+        sed -i 's/\${{ vars.TOKEN_PLACEHOLDER }}/${{ vars.TOKEN_PLACEHOLDER }}/g' animateur/animateur.html
+        sed -i 's/\${{ vars.GIST_ID }}/${{ vars.GIST_ID }}/g' animateur/animateur.html
     
     - name: Setup Pages
       uses: actions/configure-pages@v3
