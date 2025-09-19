@@ -575,15 +575,15 @@
         let currentRotation = 0;
 
         const FILENAME = 'wheel-participants.json';
-        const GITHUB_TOKEN = '${{ vars.TOKEN_PLACEHOLDER }}';
+        const GH_TOKEN = '${{ vars.TOKEN_PLACEHOLDER }}';
         const GIST_ID = '${{ vars.GIST_ID }}';
 
         function getGithubConfig() {
-            if (!GITHUB_TOKEN || GITHUB_TOKEN.includes('{{') || !GIST_ID || GIST_ID.includes('{{')) {
+            if (!GH_TOKEN || GH_TOKEN.includes('{{') || !GIST_ID || GIST_ID.includes('{{')) {
                 return null;
             }
             return {
-                token: GITHUB_TOKEN,
+                token: GH_TOKEN,
                 gistId: GIST_ID
             };
         }
