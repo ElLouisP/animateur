@@ -573,19 +573,25 @@
         let wheelSegments = [];
         let isSpinning = false;
         let currentRotation = 0;
+        let config = {};
 
         const FILENAME = 'wheel-participants.json';
-        const GH_TOKEN = '${{ secrets.GH_TOKEN }}';
-        const GIST_ID = '${{ secrets.GIST_ID }}';
 
-        function getGithubConfig() {
-            if (!GH_TOKEN || GH_TOKEN.includes('{{') || !GIST_ID || GIST_ID.includes('{{')) {
-                return null;
+        async function loadConfig() {
+            try {
+                const response = await fetch('./config.json');
+                if (response.ok) {
+                    config = await response.json();
+                    updateConfigStatus();
+                    return true;
+                } else {
+                    throw new Error('Fichier config.json introuvable');
+                }
+            } catch (error) {
+                console.error('Erreur chargement config:', error);
+                updateConfigStatus();
+                return false;
             }
-            return {
-                token: GH_TOKEN,
-                gistId: GIST_ID
-            };
         }
 
         function updateConfigStatus() {
@@ -593,16 +599,14 @@
             const loadBtn = document.getElementById('loadBtn');
             const saveBtn = document.getElementById('saveBtn');
 
-            const config = getGithubConfig();
-
-            if (config) {
+            if (config.github_token && config.gist_id) {
                 statusEl.className = 'config-status config-success';
-                statusEl.innerHTML = `✅ Configuration OK`;
+                statusEl.innerHTML = '✅ Configuration OK';
                 loadBtn.disabled = false;
                 saveBtn.disabled = false;
             } else {
                 statusEl.className = 'config-status config-error';
-                statusEl.innerHTML = `❌ Variables GitHub non configurées`;
+                statusEl.innerHTML = '❌ Fichier config.json manquant ou invalide';
                 loadBtn.disabled = true;
                 saveBtn.disabled = true;
             }
@@ -617,10 +621,8 @@
         }
 
         async function saveToGithub() {
-            const config = getGithubConfig();
-
-            if (!config) {
-                showStatus('❌ Configuration manquante', true);
+            if (!config.github_token || !config.gist_id) {
+                showStatus('Configuration manquante', true);
                 return;
             }
 
@@ -630,10 +632,10 @@
             };
 
             try {
-                const response = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                const response = await fetch(`https://api.github.com/gists/${config.gist_id}`, {
                     method: 'PATCH',
                     headers: {
-                        'Authorization': `token ${config.token}`,
+                        'Authorization': `token ${config.github_token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -658,16 +660,14 @@
         }
 
         async function loadFromGithub() {
-            const config = getGithubConfig();
-
-            if (!config) {
-                showStatus('❌ Configuration manquante', true);
+            if (!config.github_token || !config.gist_id) {
+                showStatus('Configuration manquante', true);
                 return;
             }
 
             try {
-                const response = await fetch(`https://api.github.com/gists/${config.gistId}`, {
-                    headers: { 'Authorization': `token ${config.token}` }
+                const response = await fetch(`https://api.github.com/gists/${config.gist_id}`, {
+                    headers: { 'Authorization': `token ${config.github_token}` }
                 });
 
                 if (response.ok) {
@@ -705,8 +705,7 @@
                 drawWheel();
                 showStatus('📊 Statistiques remises à zéro');
 
-                const config = getGithubConfig();
-                if (config) {
+                if (config.github_token && config.gist_id) {
                     saveToGithub();
                 }
             }
@@ -936,8 +935,7 @@
                 participants[winner].selections++;
                 participants[winner].weight = calculateWeight(participants[winner].selections);
 
-                const config = getGithubConfig();
-                if (config) {
+                if (config.github_token && config.gist_id) {
                     saveToGithub();
                 }
 
@@ -982,11 +980,10 @@
         updateWheelSegments();
         drawWheel();
         updateNameList();
-        updateConfigStatus();
 
-        window.addEventListener('load', () => {
-            const config = getGithubConfig();
-            if (config) {
+        window.addEventListener('load', async () => {
+            const configLoaded = await loadConfig();
+            if (configLoaded && config.github_token && config.gist_id) {
                 loadFromGithub();
             }
         });
