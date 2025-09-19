@@ -23,7 +23,6 @@
             position: relative;
         }
 
-        /* Particules animées en arrière-plan */
         .particle {
             position: absolute;
             width: 4px;
@@ -212,12 +211,6 @@
             background: #fed7d7;
             color: #c53030;
             border: 1px solid #fbb6ce;
-        }
-
-        .config-warning {
-            background: #fef5e7;
-            color: #d69e2e;
-            border: 1px solid #f6e05e;
         }
 
         .github-buttons {
@@ -513,27 +506,6 @@
         .hidden {
             display: none;
         }
-
-        .env-info {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #2196f3;
-            font-size: 13px;
-            color: #1976d2;
-        }
-
-        .code-block {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
     </style>
 </head>
 
@@ -552,16 +524,9 @@
             <h2>👥 Participants</h2>
 
             <div class="github-config">
-                <h3>⚙️ Configuration GitHub</h3>
+                <h3>📦 GitHub</h3>
 
                 <div id="configStatus" class="config-status"></div>
-
-                <div class="env-info">
-                    <strong>📋 Variables d'environnement requises :</strong>
-                    <div class="code-block">
-                        TOKEN=ghp_votre_token_ici
-                        GIST_ID=votre_gist_id_ici</div>
-                </div>
 
                 <div class="github-buttons">
                     <button class="github-btn" id="loadBtn" onclick="loadFromGithub()">📥 Charger</button>
@@ -592,10 +557,6 @@
     </div>
 
     <script>
-        // =====================================
-        // 📊 DONNÉES ET VARIABLES
-        // =====================================
-
         let participants = {
             'Louis': { active: true, selections: 0, weight: 1 },
             'Regis': { active: true, selections: 0, weight: 1 },
@@ -614,24 +575,17 @@
         let currentRotation = 0;
 
         const FILENAME = 'wheel-participants.json';
+        const GH_TOKEN = '${{ secrets.GH_TOKEN }}';
+        const GIST_ID = '${{ secrets.GIST_ID }}';
 
-        // =====================================
-        // 🔐 CONFIGURATION VIA VARIABLES D'ENVIRONNEMENT
-        // =====================================
-
-        function getEnvironmentConfig() {
-            // Variables d'environnement (remplacez par vos valeurs)
-            const config = {
-                token: 'TOKEN_PLACEHOLDER',
-                gistId: ''
-            };
-
-            // Vérifier si les variables sont configurées
-            if (config.token === 'TOKEN_PLACEHOLDER' || config.gistId === '') {
+        function getGithubConfig() {
+            if (!GH_TOKEN || GH_TOKEN.includes('{{') || !GIST_ID || GIST_ID.includes('{{')) {
                 return null;
             }
-
-            return config;
+            return {
+                token: GH_TOKEN,
+                gistId: GIST_ID
+            };
         }
 
         function updateConfigStatus() {
@@ -639,23 +593,16 @@
             const loadBtn = document.getElementById('loadBtn');
             const saveBtn = document.getElementById('saveBtn');
 
-            const config = getEnvironmentConfig();
+            const config = getGithubConfig();
 
             if (config) {
                 statusEl.className = 'config-status config-success';
-                statusEl.innerHTML = `
-                    ✅ <strong>Configuration OK</strong><br>
-                    🔑 Token: ****${config.token.slice(-4)}<br>
-                    📁 Gist: ${config.gistId.slice(0, 8)}...
-                `;
+                statusEl.innerHTML = `✅ Configuration OK`;
                 loadBtn.disabled = false;
                 saveBtn.disabled = false;
             } else {
                 statusEl.className = 'config-status config-error';
-                statusEl.innerHTML = `
-                    ❌ <strong>Variables non configurées</strong><br>
-                    Remplacez les placeholders dans le code source
-                `;
+                statusEl.innerHTML = `❌ Variables GitHub non configurées`;
                 loadBtn.disabled = true;
                 saveBtn.disabled = true;
             }
@@ -669,12 +616,8 @@
             setTimeout(() => statusEl.classList.add('hidden'), 5000);
         }
 
-        // =====================================
-        // 🔗 FONCTIONS GITHUB
-        // =====================================
-
         async function saveToGithub() {
-            const config = getEnvironmentConfig();
+            const config = getGithubConfig();
 
             if (!config) {
                 showStatus('❌ Configuration manquante', true);
@@ -687,54 +630,23 @@
             };
 
             try {
-                let response;
-
-                if (config.gistId && config.gistId !== 'GIST_ID_PLACEHOLDER') {
-                    // Mettre à jour un gist existant
-                    response = await fetch(`https://api.github.com/gists/${config.gistId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `token ${config.token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            files: {
-                                [FILENAME]: {
-                                    content: JSON.stringify(data, null, 2)
-                                }
+                const response = await fetch(`https://api.github.com/gists/${config.gistId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            [FILENAME]: {
+                                content: JSON.stringify(data, null, 2)
                             }
-                        })
-                    });
-                } else {
-                    // Créer un nouveau gist
-                    response = await fetch('https://api.github.com/gists', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${config.token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            description: 'Données de la roue de sélection d\'animateur',
-                            public: false,
-                            files: {
-                                [FILENAME]: {
-                                    content: JSON.stringify(data, null, 2)
-                                }
-                            }
-                        })
-                    });
-                }
+                        }
+                    })
+                });
 
                 if (response.ok) {
-                    const result = await response.json();
-                    if (!config.gistId || config.gistId === 'GIST_ID_PLACEHOLDER') {
-                        console.log('🎉 Nouveau Gist créé!');
-                        console.log('📋 ID du Gist:', result.id);
-                        console.log('⚠️  Remplacez GIST_ID_PLACEHOLDER par:', result.id);
-                        showStatus(`✅ Gist créé ! Voir console pour l'ID`);
-                    } else {
-                        showStatus('✅ Données sauvegardées sur GitHub !');
-                    }
+                    showStatus('✅ Données sauvegardées sur GitHub !');
                 } else {
                     const error = await response.json();
                     throw new Error(error.message || 'Erreur lors de la sauvegarde');
@@ -746,15 +658,10 @@
         }
 
         async function loadFromGithub() {
-            const config = getEnvironmentConfig();
+            const config = getGithubConfig();
 
             if (!config) {
                 showStatus('❌ Configuration manquante', true);
-                return;
-            }
-
-            if (!config.gistId || config.gistId === 'GIST_ID_PLACEHOLDER') {
-                showStatus('❌ ID du Gist non configuré', true);
                 return;
             }
 
@@ -798,17 +705,12 @@
                 drawWheel();
                 showStatus('📊 Statistiques remises à zéro');
 
-                // Sauvegarder automatiquement si configuré
-                const config = getEnvironmentConfig();
-                if (config && config.gistId && config.gistId !== 'GIST_ID_PLACEHOLDER') {
+                const config = getGithubConfig();
+                if (config) {
                     saveToGithub();
                 }
             }
         }
-
-        // =====================================
-        // ⚖️ LOGIQUE DE PONDÉRATION
-        // =====================================
 
         function calculateWeight(selections) {
             return Math.max(0.1, 1 / (1 + selections * 0.3));
@@ -848,10 +750,6 @@
 
             return activeParticipants[0][0];
         }
-
-        // =====================================
-        // 🎨 FONCTIONS D'AFFICHAGE
-        // =====================================
 
         function shuffleArray(array) {
             const shuffled = [...array];
@@ -1020,10 +918,6 @@
             }
         }
 
-        // =====================================
-        // 🎲 LOGIQUE DE JEU
-        // =====================================
-
         function spin() {
             if (isSpinning || wheelSegments.length === 0) return;
 
@@ -1042,9 +936,8 @@
                 participants[winner].selections++;
                 participants[winner].weight = calculateWeight(participants[winner].selections);
 
-                // Sauvegarder automatiquement si configuré
-                const config = getEnvironmentConfig();
-                if (config && config.gistId && config.gistId !== 'GIST_ID_PLACEHOLDER') {
+                const config = getGithubConfig();
+                if (config) {
                     saveToGithub();
                 }
 
@@ -1085,10 +978,6 @@
             }
         }
 
-        // =====================================
-        // 🚀 INITIALISATION
-        // =====================================
-
         createParticles();
         updateWheelSegments();
         drawWheel();
@@ -1096,8 +985,8 @@
         updateConfigStatus();
 
         window.addEventListener('load', () => {
-            const config = getEnvironmentConfig();
-            if (config && config.gistId && config.gistId !== 'GIST_ID_PLACEHOLDER') {
+            const config = getGithubConfig();
+            if (config) {
                 loadFromGithub();
             }
         });
