@@ -1,8 +1,9 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,21 +16,23 @@ jobs:
     environment: github-pages
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
     
     - name: Replace variables
+      env:
+        TOKEN: ${{ vars.TOKEN_PLACEHOLDER }}
+        GIST: ${{ vars.GIST_ID }}
       run: |
-        sed -i "s|\${{ vars.TOKEN_PLACEHOLDER }}|${{ vars.TOKEN_PLACEHOLDER }}|g" animateur.html
-        sed -i "s|\${{ vars.GIST_ID }}|${{ vars.GIST_ID }}|g" animateur.html
+        sed -i "s/\${{ vars.TOKEN_PLACEHOLDER }}/$TOKEN/g" animateur.html
+        sed -i "s/\${{ vars.GIST_ID }}/$GIST/g" animateur.html
         
     - name: Setup Pages
       uses: actions/configure-pages@v3
-    
-    - name: Upload artifact
+      
+    - name: Upload
       uses: actions/upload-pages-artifact@v2
       with:
         path: '.'
-    
-    - name: Deploy to GitHub Pages
+        
+    - name: Deploy
       uses: actions/deploy-pages@v2

@@ -575,8 +575,8 @@
         let currentRotation = 0;
 
         const FILENAME = 'wheel-participants.json';
-        const GH_TOKEN = '${{ vars.TOKEN_PLACEHOLDER }}';
-        const GIST_ID = '${{ vars.GIST_ID }}';
+        const GH_TOKEN = '${{ secrets.GH_TOKEN }}';
+        const GIST_ID = '${{ secrets.GIST_ID }}';
 
         function getGithubConfig() {
             if (!GH_TOKEN || GH_TOKEN.includes('{{') || !GIST_ID || GIST_ID.includes('{{')) {
