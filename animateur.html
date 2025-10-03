@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,15 +19,48 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Particules animées en arrière-plan */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
         }
 
         .container {
             display: flex;
             gap: 40px;
             align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
+            z-index: 10;
+            position: relative;
         }
 
         .wheel-section {
@@ -42,6 +76,7 @@
             height: 450px;
         }
 
+        /* Effet de halo lumineux */
         .wheel-glow {
             position: absolute;
             top: 50%;
@@ -55,10 +90,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translate(-50%, -50%) scale(1);
                 opacity: 0.3;
             }
+
             50% {
                 transform: translate(-50%, -50%) scale(1.1);
                 opacity: 0.5;
@@ -71,9 +109,11 @@
             border-radius: 50%;
             position: relative;
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
         }
 
+        /* Flèche indicatrice */
         .pointer {
             position: absolute;
             top: -30px;
@@ -86,8 +126,22 @@
             border-top: 50px solid #FFD700;
             filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
             z-index: 10;
+            animation: bounce 1s ease-in-out infinite;
         }
 
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* Bouton de lancement */
         .spin-button {
             padding: 20px 50px;
             font-size: 24px;
@@ -99,13 +153,34 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        .spin-button:hover:not(:disabled) {
+        .spin-button:hover {
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .spin-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover::before {
+            left: 100%;
         }
 
         .spin-button:disabled {
@@ -113,13 +188,14 @@
             cursor: not-allowed;
         }
 
+        /* Panel de gestion des noms */
         .control-panel {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 100%;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
         }
 
         .control-panel h2 {
@@ -129,86 +205,24 @@
             font-size: 28px;
         }
 
-        .db-config {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+        .controls-section {
             margin-bottom: 20px;
-        }
-
-        .db-config h3 {
-            color: #764ba2;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .config-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .config-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .config-button {
-            width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .config-button:hover {
-            background: #5a67d8;
-        }
-
-        .status-message {
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 14px;
             text-align: center;
         }
 
-        .status-success {
-            background: #c6f6d5;
-            color: #2f855a;
-        }
-
-        .status-error {
-            background: #fed7d7;
-            color: #c53030;
-        }
-
-        .controls-section {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .control-btn {
-            flex: 1;
+        .randomize-button {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
+            margin-bottom: 15px;
         }
 
-        .control-btn:hover {
+        .randomize-button:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
@@ -222,12 +236,24 @@
         .name-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 12px;
             margin: 8px 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 10px;
             transition: all 0.3s;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .name-item.excluded {
@@ -235,19 +261,15 @@
             opacity: 0.6;
         }
 
-        .name-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
         .name-item input[type="checkbox"] {
             width: 20px;
             height: 20px;
+            margin-right: 15px;
             cursor: pointer;
         }
 
         .name-item label {
+            flex: 1;
             color: white;
             font-weight: 500;
             cursor: pointer;
@@ -258,19 +280,10 @@
             text-decoration: line-through;
         }
 
-        .name-stats {
-            color: white;
-            font-size: 12px;
-            text-align: right;
-        }
-
-        .name-item.excluded .name-stats {
-            color: #666;
-        }
-
         .add-name-section {
             display: flex;
             gap: 10px;
+            margin-top: 20px;
         }
 
         .add-name-input {
@@ -279,6 +292,7 @@
             border: 2px solid #764ba2;
             border-radius: 10px;
             font-size: 16px;
+            transition: all 0.3s;
         }
 
         .add-name-input:focus {
@@ -300,8 +314,31 @@
 
         .add-button:hover {
             transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
+        /* Effet de confettis */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f39c12;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Modal de résultat */
         .winner-modal {
             position: fixed;
             top: 0;
@@ -313,6 +350,17 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .winner-content {
@@ -325,8 +373,13 @@
         }
 
         @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
         }
 
         .winner-content h1 {
@@ -345,8 +398,13 @@
         }
 
         @keyframes glow {
-            from { text-shadow: 0 0 10px #fff, 0 0 20px #ffd700; }
-            to { text-shadow: 0 0 20px #fff, 0 0 40px #ffd700; }
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #ffd700, 0 0 30px #ffd700;
+            }
+
+            to {
+                text-shadow: 0 0 20px #fff, 0 0 30px #ffd700, 0 0 40px #ffd700;
+            }
         }
 
         .close-modal {
@@ -357,33 +415,18 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
+            margin-top: 20px;
             transition: all 0.3s;
             font-weight: bold;
         }
 
         .close-modal:hover {
             transform: scale(1.1);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            animation: confetti-fall 3s linear forwards;
-        }
-
-        @keyframes confetti-fall {
-            to {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="wheel-section">
@@ -397,25 +440,13 @@
 
         <div class="control-panel">
             <h2>👥 Participants</h2>
-
-            <div class="db-config">
-                <h3>🔗 Configuration Supabase</h3>
-                <input type="text" class="config-input" id="supabaseUrl" placeholder="URL Supabase">
-                <input type="password" class="config-input" id="supabaseKey" placeholder="Clé API (anon key)">
-                <button class="config-button" onclick="saveConfig()">💾 Sauvegarder Config</button>
-                <button class="config-button" onclick="loadData()" style="margin-top: 10px;">📥 Charger données</button>
-                <div id="statusMessage" class="status-message hidden"></div>
-            </div>
-
             <div class="controls-section">
-                <button class="control-btn" onclick="randomizeOrder()">🔀 Mélanger</button>
-                <button class="control-btn" onclick="resetStats()">🔄 Reset Stats</button>
+                <button class="randomize-button" onclick="randomizeOrder()">🔀 Mélanger l'ordre</button>
             </div>
-
             <div class="name-list" id="nameList"></div>
-
             <div class="add-name-section">
-                <input type="text" class="add-name-input" id="newName" placeholder="Ajouter un nom..." onkeypress="if(event.key==='Enter') addName()">
+                <input type="text" class="add-name-input" id="newName" placeholder="Ajouter un nom..."
+                    onkeypress="if(event.key==='Enter') addName()">
                 <button class="add-button" onclick="addName()">Ajouter</button>
             </div>
         </div>
@@ -430,149 +461,13 @@
     </div>
 
     <script>
-        let participants = {
-            'Louis': { active: true, selections: 0 },
-            'Regis': { active: true, selections: 0 },
-            'Sebastien': { active: true, selections: 0 },
-            'Guillaume': { active: true, selections: 0 },
-            'Laurent': { active: true, selections: 0 },
-            'Adrien': { active: true, selections: 0 },
-            'Damien': { active: true, selections: 0 },
-            'Mathieu': { active: true, selections: 0 },
-            'Eric': { active: true, selections: 0 },
-            'Florent': { active: true, selections: 0 }
-        };
-
-        let wheelSegments = [];
+        let names = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
+        let activeNames = [...names];
+        let shuffledActiveNames = [...activeNames]; // Nouvelle variable pour l'ordre mélangé
         let isSpinning = false;
         let currentRotation = 0;
-        let supabaseUrl = '';
-        let supabaseKey = '';
 
-        const colors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
-            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
-            '#BB8FCE', '#85C1E2', '#F8B739', '#52D681'
-        ];
-
-        function saveConfig() {
-            supabaseUrl = document.getElementById('supabaseUrl').value.trim();
-            supabaseKey = document.getElementById('supabaseKey').value.trim();
-            
-            if (supabaseUrl && supabaseKey) {
-                showStatus('✅ Configuration sauvegardée', false);
-            } else {
-                showStatus('❌ Veuillez remplir tous les champs', true);
-            }
-        }
-
-        function showStatus(message, isError) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = isError ? 'status-message status-error' : 'status-message status-success';
-            statusEl.classList.remove('hidden');
-            setTimeout(() => statusEl.classList.add('hidden'), 3000);
-        }
-
-        async function loadData() {
-            if (!supabaseUrl || !supabaseKey) {
-                showStatus('❌ Configurez d\'abord Supabase', true);
-                return;
-            }
-
-            try {
-                const response = await fetch(`${supabaseUrl}/rest/v1/participants?select=*`, {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.length > 0) {
-                        participants = {};
-                        data.forEach(p => {
-                            participants[p.name] = {
-                                active: p.active,
-                                selections: p.selections
-                            };
-                        });
-                        updateWheelSegments();
-                        updateNameList();
-                        drawWheel();
-                        showStatus('✅ Données chargées', false);
-                    }
-                } else {
-                    throw new Error('Erreur de chargement');
-                }
-            } catch (error) {
-                showStatus('❌ ' + error.message, true);
-            }
-        }
-
-        async function saveData() {
-            if (!supabaseUrl || !supabaseKey) return;
-
-            try {
-                const data = Object.entries(participants).map(([name, info]) => ({
-                    name: name,
-                    active: info.active,
-                    selections: info.selections
-                }));
-
-                const response = await fetch(`${supabaseUrl}/rest/v1/participants`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': `Bearer ${supabaseKey}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'resolution=merge-duplicates'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    showStatus('✅ Données sauvegardées', false);
-                }
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-            }
-        }
-
-        function calculateWeight(selections) {
-            return Math.max(0.1, 1 / (1 + selections * 0.3));
-        }
-
-        function updateWheelSegments() {
-            wheelSegments = Object.entries(participants)
-                .filter(([name, data]) => data.active)
-                .map(([name]) => name);
-            wheelSegments = shuffleArray(wheelSegments);
-        }
-
-        function selectWeightedWinner() {
-            const activeParticipants = Object.entries(participants)
-                .filter(([name, data]) => data.active);
-
-            let totalWeight = 0;
-            const weightedArray = [];
-
-            activeParticipants.forEach(([name, data]) => {
-                const weight = calculateWeight(data.selections);
-                totalWeight += weight;
-                weightedArray.push({ name, cumulativeWeight: totalWeight });
-            });
-
-            const random = Math.random() * totalWeight;
-            for (let item of weightedArray) {
-                if (random <= item.cumulativeWeight) {
-                    return item.name;
-                }
-            }
-            return activeParticipants[0][0];
-        }
-
+        // Fonction pour mélanger un tableau (algorithme Fisher-Yates)
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -582,20 +477,31 @@
             return shuffled;
         }
 
+        // Fonction pour mélanger l'ordre des noms
         function randomizeOrder() {
-            updateWheelSegments();
+            shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
         }
 
-        function resetStats() {
-            if (confirm('Remettre à zéro toutes les statistiques ?')) {
-                Object.keys(participants).forEach(name => {
-                    participants[name].selections = 0;
-                });
-                updateNameList();
-                saveData();
+        // Générer des particules d'arrière-plan
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
             }
         }
+
+        // Couleurs vibrantes pour les segments
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#BB8FCE', '#85C1E2', '#F8B739', '#52D681'
+        ];
 
         function drawWheel() {
             const canvas = document.getElementById('wheelCanvas');
@@ -606,7 +512,7 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (wheelSegments.length === 0) {
+            if (shuffledActiveNames.length === 0) {
                 ctx.fillStyle = '#764ba2';
                 ctx.font = 'bold 24px Arial';
                 ctx.textAlign = 'center';
@@ -614,46 +520,44 @@
                 return;
             }
 
-            const angleStep = (Math.PI * 2) / wheelSegments.length;
-            const uniqueNames = [...new Set(wheelSegments)];
-            const nameToColor = {};
-            uniqueNames.forEach((name, index) => {
-                nameToColor[name] = colors[index % colors.length];
-            });
+            const angleStep = (Math.PI * 2) / shuffledActiveNames.length;
 
-            wheelSegments.forEach((name, index) => {
+            // Utilise shuffledActiveNames au lieu de activeNames
+            shuffledActiveNames.forEach((name, index) => {
                 const startAngle = index * angleStep - Math.PI / 2;
                 const endAngle = startAngle + angleStep;
 
+                // Dessiner le segment
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
                 ctx.closePath();
-                ctx.fillStyle = nameToColor[name];
+
+                // Remplir avec la couleur
+                ctx.fillStyle = colors[index % colors.length];
                 ctx.fill();
+
+                // Ajouter une bordure blanche
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
                 ctx.stroke();
+
+                // Ajouter le texte
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + angleStep / 2);
+                ctx.textAlign = "center";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 18px Arial";
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.fillText(name, radius * 0.65, 0);
+                ctx.restore();
             });
 
-            const drawnNames = new Set();
-            wheelSegments.forEach((name, index) => {
-                if (!drawnNames.has(name)) {
-                    const startAngle = index * angleStep - Math.PI / 2;
-                    ctx.save();
-                    ctx.translate(centerX, centerY);
-                    ctx.rotate(startAngle + angleStep / 2);
-                    ctx.textAlign = "center";
-                    ctx.fillStyle = "white";
-                    ctx.font = "bold 18px Arial";
-                    ctx.shadowColor = "rgba(0,0,0,0.5)";
-                    ctx.shadowBlur = 4;
-                    ctx.fillText(name, radius * 0.65, 0);
-                    ctx.restore();
-                    drawnNames.add(name);
-                }
-            });
-
+            // Dessiner le cercle central
             ctx.beginPath();
             ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
@@ -667,88 +571,90 @@
             const list = document.getElementById('nameList');
             list.innerHTML = '';
 
-            Object.entries(participants).forEach(([name, data]) => {
+            names.forEach((name, index) => {
                 const item = document.createElement('div');
-                item.className = 'name-item' + (!data.active ? ' excluded' : '');
-
-                const leftDiv = document.createElement('div');
-                leftDiv.className = 'name-left';
+                item.className = 'name-item';
+                if (!activeNames.includes(name)) {
+                    item.classList.add('excluded');
+                }
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = data.active;
+                checkbox.id = `name-${index}`;
+                checkbox.checked = activeNames.includes(name);
                 checkbox.onchange = () => toggleName(name);
 
                 const label = document.createElement('label');
+                label.htmlFor = `name-${index}`;
                 label.textContent = name;
-                label.onclick = () => checkbox.click();
 
-                leftDiv.appendChild(checkbox);
-                leftDiv.appendChild(label);
-
-                const statsDiv = document.createElement('div');
-                statsDiv.className = 'name-stats';
-                const weight = calculateWeight(data.selections);
-                const maxWeight = Math.max(...Object.values(participants).filter(p => p.active).map(p => calculateWeight(p.selections)));
-                const percentage = maxWeight > 0 ? ((weight / maxWeight) * 100).toFixed(1) : '0';
-                statsDiv.innerHTML = `${data.selections}x<br>${percentage}%`;
-
-                item.appendChild(leftDiv);
-                item.appendChild(statsDiv);
+                item.appendChild(checkbox);
+                item.appendChild(label);
                 list.appendChild(item);
             });
         }
 
         function toggleName(name) {
-            participants[name].active = !participants[name].active;
-            updateWheelSegments();
-            updateNameList();
+            const index = activeNames.indexOf(name);
+            if (index > -1) {
+                activeNames.splice(index, 1);
+            } else {
+                activeNames.push(name);
+            }
+            // Mettre à jour shuffledActiveNames quand activeNames change
+            shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
-            saveData();
         }
 
         function addName() {
             const input = document.getElementById('newName');
             const name = input.value.trim();
 
-            if (name && !participants[name]) {
-                participants[name] = { active: true, selections: 0 };
+            if (name && !names.includes(name)) {
+                names.push(name);
+                activeNames.push(name);
+                // Mettre à jour shuffledActiveNames
+                shuffledActiveNames = shuffleArray(activeNames);
                 input.value = '';
-                updateWheelSegments();
                 updateNameList();
                 drawWheel();
-                saveData();
             }
         }
 
         function spin() {
-            if (isSpinning || wheelSegments.length === 0) return;
+            if (isSpinning || shuffledActiveNames.length === 0) return;
 
             isSpinning = true;
             document.getElementById('spinBtn').disabled = true;
 
             const canvas = document.getElementById('wheelCanvas');
-            const spinAngle = Math.random() * 360 + 1440;
+            const spinAngle = Math.random() * 360 + 1440; // Au moins 4 tours
             currentRotation += spinAngle;
+
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
-                const winner = selectWeightedWinner();
-                participants[winner].selections++;
-                
-                saveData();
-                updateNameList();
+                // Calculer le gagnant basé sur l'angle final
+                const finalAngle = currentRotation % 360;
+                const segmentAngle = 360 / shuffledActiveNames.length;
+
+                // Calcul corrigé : on inverse la rotation et on ajuste pour que la flèche soit à 0°
+                const normalizedAngle = (360 - finalAngle) % 360;
+                const winnerIndex = Math.floor(normalizedAngle / segmentAngle) % shuffledActiveNames.length;
+                const winner = shuffledActiveNames[winnerIndex];
+
                 showWinner(winner);
                 createConfetti();
-                
                 isSpinning = false;
                 document.getElementById('spinBtn').disabled = false;
             }, 4000);
         }
 
         function showWinner(name) {
-            document.getElementById('winnerName').textContent = name;
-            document.getElementById('winnerModal').style.display = 'flex';
+            const modal = document.getElementById('winnerModal');
+            const winnerName = document.getElementById('winnerName');
+            winnerName.textContent = name;
+            modal.style.display = 'flex';
         }
 
         function closeModal() {
@@ -756,29 +662,37 @@
         }
 
         function createConfetti() {
-            const confettiColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD'];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD'];
+
             for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.top = '-10px';
-                    confetti.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
                     document.body.appendChild(confetti);
+
                     setTimeout(() => confetti.remove(), 3500);
                 }, i * 30);
             }
         }
 
-        updateWheelSegments();
+        // Initialisation
+        createParticles();
+        // Mélanger l'ordre initial
+        shuffledActiveNames = shuffleArray(activeNames);
         drawWheel();
         updateNameList();
 
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('winnerModal')) {
+        // Fermer le modal en cliquant à l'extérieur
+        window.onclick = function (event) {
+            const modal = document.getElementById('winnerModal');
+            if (event.target == modal) {
                 closeModal();
             }
         }
     </script>
 </body>
+
 </html>
