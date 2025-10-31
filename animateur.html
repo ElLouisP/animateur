@@ -194,7 +194,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 350px;
+            max-width: 400px;
             backdrop-filter: blur(10px);
         }
 
@@ -242,6 +242,7 @@
             border-radius: 10px;
             transition: all 0.3s;
             animation: slideIn 0.4s ease-out;
+            gap: 10px;
         }
 
         @keyframes slideIn {
@@ -264,7 +265,6 @@
         .name-item input[type="checkbox"] {
             width: 20px;
             height: 20px;
-            margin-right: 15px;
             cursor: pointer;
         }
 
@@ -278,6 +278,51 @@
         .name-item.excluded label {
             color: #666;
             text-decoration: line-through;
+        }
+
+        .weight-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .weight-button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: #764ba2;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .weight-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .weight-button:active {
+            transform: scale(0.95);
+        }
+
+        .weight-display {
+            min-width: 30px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .name-item.excluded .weight-button,
+        .name-item.excluded .weight-display {
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         .add-name-section {
@@ -462,8 +507,15 @@
 
     <script>
         let names = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
+        let nameWeights = {}; // Objet pour stocker les poids de chaque nom
+        
+        // Initialiser les poids à 1 pour tous les noms
+        names.forEach(name => {
+            nameWeights[name] = 1;
+        });
+
         let activeNames = [...names];
-        let shuffledActiveNames = [...activeNames]; // Nouvelle variable pour l'ordre mélangé
+        let shuffledActiveNames = [...activeNames];
         let isSpinning = false;
         let currentRotation = 0;
 
@@ -481,6 +533,24 @@
         function randomizeOrder() {
             shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
+        }
+
+        // Fonction pour augmenter le poids
+        function increaseWeight(name) {
+            if (nameWeights[name] < 20) {
+                nameWeights[name]++;
+                updateNameList();
+                drawWheel();
+            }
+        }
+
+        // Fonction pour diminuer le poids
+        function decreaseWeight(name) {
+            if (nameWeights[name] > 1) {
+                nameWeights[name]--;
+                updateNameList();
+                drawWheel();
+            }
         }
 
         // Générer des particules d'arrière-plan
@@ -520,17 +590,20 @@
                 return;
             }
 
-            const angleStep = (Math.PI * 2) / shuffledActiveNames.length;
+            // Calculer le total des poids
+            const totalWeight = shuffledActiveNames.reduce((sum, name) => sum + nameWeights[name], 0);
 
-            // Utilise shuffledActiveNames au lieu de activeNames
+            let currentAngle = -Math.PI / 2; // Commencer en haut
+
             shuffledActiveNames.forEach((name, index) => {
-                const startAngle = index * angleStep - Math.PI / 2;
-                const endAngle = startAngle + angleStep;
+                const weight = nameWeights[name];
+                const angleSize = (weight / totalWeight) * Math.PI * 2;
+                const endAngle = currentAngle + angleSize;
 
                 // Dessiner le segment
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.arc(centerX, centerY, radius, currentAngle, endAngle);
                 ctx.closePath();
 
                 // Remplir avec la couleur
@@ -545,7 +618,7 @@
                 // Ajouter le texte
                 ctx.save();
                 ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + angleStep / 2);
+                ctx.rotate(currentAngle + angleSize / 2);
                 ctx.textAlign = "center";
                 ctx.fillStyle = "white";
                 ctx.font = "bold 18px Arial";
@@ -555,6 +628,8 @@
                 ctx.shadowOffsetY = 2;
                 ctx.fillText(name, radius * 0.65, 0);
                 ctx.restore();
+
+                currentAngle = endAngle;
             });
 
             // Dessiner le cercle central
@@ -588,8 +663,37 @@
                 label.htmlFor = `name-${index}`;
                 label.textContent = name;
 
+                // Contrôles de poids
+                const weightControls = document.createElement('div');
+                weightControls.className = 'weight-controls';
+
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'weight-button';
+                minusBtn.textContent = '−';
+                minusBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    decreaseWeight(name);
+                };
+
+                const weightDisplay = document.createElement('span');
+                weightDisplay.className = 'weight-display';
+                weightDisplay.textContent = nameWeights[name];
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'weight-button';
+                plusBtn.textContent = '+';
+                plusBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    increaseWeight(name);
+                };
+
+                weightControls.appendChild(minusBtn);
+                weightControls.appendChild(weightDisplay);
+                weightControls.appendChild(plusBtn);
+
                 item.appendChild(checkbox);
                 item.appendChild(label);
+                item.appendChild(weightControls);
                 list.appendChild(item);
             });
         }
@@ -601,7 +705,6 @@
             } else {
                 activeNames.push(name);
             }
-            // Mettre à jour shuffledActiveNames quand activeNames change
             shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
         }
@@ -613,7 +716,7 @@
             if (name && !names.includes(name)) {
                 names.push(name);
                 activeNames.push(name);
-                // Mettre à jour shuffledActiveNames
+                nameWeights[name] = 1; // Initialiser le poids à 1
                 shuffledActiveNames = shuffleArray(activeNames);
                 input.value = '';
                 updateNameList();
@@ -628,20 +731,32 @@
             document.getElementById('spinBtn').disabled = true;
 
             const canvas = document.getElementById('wheelCanvas');
-            const spinAngle = Math.random() * 360 + 1440; // Au moins 4 tours
+            const spinAngle = Math.random() * 360 + 1440;
             currentRotation += spinAngle;
 
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
-                // Calculer le gagnant basé sur l'angle final
                 const finalAngle = currentRotation % 360;
-                const segmentAngle = 360 / shuffledActiveNames.length;
-
-                // Calcul corrigé : on inverse la rotation et on ajuste pour que la flèche soit à 0°
                 const normalizedAngle = (360 - finalAngle) % 360;
-                const winnerIndex = Math.floor(normalizedAngle / segmentAngle) % shuffledActiveNames.length;
-                const winner = shuffledActiveNames[winnerIndex];
+                
+                // Calculer le total des poids
+                const totalWeight = shuffledActiveNames.reduce((sum, name) => sum + nameWeights[name], 0);
+                
+                // Trouver le gagnant en fonction des poids
+                let accumulatedAngle = 0;
+                let winner = shuffledActiveNames[0];
+                
+                for (const name of shuffledActiveNames) {
+                    const weight = nameWeights[name];
+                    const segmentAngle = (weight / totalWeight) * 360;
+                    accumulatedAngle += segmentAngle;
+                    
+                    if (normalizedAngle < accumulatedAngle) {
+                        winner = name;
+                        break;
+                    }
+                }
 
                 showWinner(winner);
                 createConfetti();
@@ -680,7 +795,6 @@
 
         // Initialisation
         createParticles();
-        // Mélanger l'ordre initial
         shuffledActiveNames = shuffleArray(activeNames);
         drawWheel();
         updateNameList();
