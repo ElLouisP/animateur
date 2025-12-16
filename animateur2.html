@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 QUI DOIT ACHETER ARC RAIDERS ? 🤖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Arc Raiders diagonal stripes overlay */
+        .stripe-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 40px,
+                #ff4444 40px,
+                #ff4444 42px,
+                transparent 42px,
+                transparent 82px,
+                #ff8844 82px,
+                #ff8844 84px,
+                transparent 84px,
+                transparent 124px,
+                #ffcc44 124px,
+                #ffcc44 126px,
+                transparent 126px,
+                transparent 166px,
+                #44ff44 166px,
+                #44ff44 168px,
+                transparent 168px,
+                transparent 208px,
+                #4488ff 208px,
+                #4488ff 210px,
+                transparent 210px,
+                transparent 250px,
+                #8844ff 250px,
+                #8844ff 252px
+            );
+        }
+
+        /* Particules animées en arrière-plan */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(234, 224, 205, 0.6);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            color: #eae0cd;
+            text-shadow: 
+                0 0 20px rgba(234, 224, 205, 0.5),
+                0 0 40px rgba(234, 224, 205, 0.3),
+                3px 3px 0 #1a1a2e;
+            letter-spacing: 0.1em;
+            position: relative;
+        }
+
+        .game-title::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -10%;
+            right: -10%;
+            height: 60%;
+            transform: translateY(-50%) skewX(-15deg);
+            background: linear-gradient(90deg, 
+                transparent,
+                #ff4444 10%,
+                #ff8844 25%,
+                #ffcc44 40%,
+                #44ff44 55%,
+                #4488ff 70%,
+                #8844ff 85%,
+                transparent
+            );
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        /* Question box */
+        .question-box {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #ff6b35;
+            border-radius: 20px;
+            padding: 20px 40px;
+            margin: 15px 0 25px 0;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 53, 0.6); }
+        }
+
+        .question {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: #eae0cd;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            z-index: 10;
+            position: relative;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .wheel-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        /* Effet de halo lumineux arc-en-ciel */
+        .wheel-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 450px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 68, 68, 0.3),
+                rgba(255, 136, 68, 0.3),
+                rgba(255, 204, 68, 0.3),
+                rgba(68, 255, 68, 0.3),
+                rgba(68, 136, 255, 0.3),
+                rgba(136, 68, 255, 0.3),
+                rgba(255, 68, 68, 0.3)
+            );
+            border-radius: 50%;
+            animation: rotateGlow 10s linear infinite;
+            pointer-events: none;
+            filter: blur(20px);
+        }
+
+        @keyframes rotateGlow {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
+                inset 0 0 40px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Flèche indicatrice */
+        .pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid #ff6b35;
+            filter: drop-shadow(0 5px 15px rgba(255, 107, 53, 0.8));
+            z-index: 10;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* Bouton de lancement */
+        .spin-button {
+            padding: 20px 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0a0a0f;
+            background: linear-gradient(45deg, #ff6b35 0%, #ff8c42 50%, #ffb347 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.6);
+        }
+
+        .spin-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover::before {
+            left: 100%;
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Panel info humoristique */
+        .info-panel {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #ff6b35;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .info-panel h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff6b35;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .participant-list {
+            margin-bottom: 20px;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 68, 68, 0.3),
+                rgba(255, 136, 68, 0.3),
+                rgba(255, 204, 68, 0.3)
+            );
+            border-radius: 10px;
+            color: #eae0cd;
+            font-weight: 500;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .participant-item:nth-child(even) {
+            background: linear-gradient(135deg, 
+                rgba(68, 255, 68, 0.3),
+                rgba(68, 136, 255, 0.3),
+                rgba(136, 68, 255, 0.3)
+            );
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .disclaimer {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .disclaimer .warning {
+            color: #ff6b35;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 5px;
+        }
+
+        .disclaimer .small {
+            font-size: 0.7rem;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .disclaimer .huissier {
+            font-size: 0.65rem;
+            color: #ff6b35;
+            margin-top: 12px;
+            font-style: italic;
+            border-top: 1px solid rgba(255, 107, 53, 0.3);
+            padding-top: 10px;
+        }
+
+        /* Images de décoration */
+        .game-image {
+            position: fixed;
+            opacity: 0.12;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: 20px;
+        }
+
+        .game-image.left {
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-10deg);
+            width: 350px;
+        }
+
+        .game-image.right {
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(10deg);
+            width: 350px;
+        }
+
+        /* Effet de confettis */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Modal de résultat */
+        .winner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .winner-wrapper {
+            position: relative;
+            padding: 6px;
+            border-radius: 34px;
+            background: conic-gradient(
+                from 0deg,
+                #ff4444, #ff8844, #ffcc44, #44ff44, #4488ff, #8844ff, #ff4444
+            );
+            animation: rotateRainbow 3s linear infinite;
+        }
+
+        @keyframes rotateRainbow {
+            from { filter: hue-rotate(0deg); }
+            to { filter: hue-rotate(360deg); }
+        }
+
+        .winner-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 30px 100px rgba(255, 107, 53, 0.3);
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 85vw;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .winner-content h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #eae0cd;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .winner-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: #ff6b35;
+            font-weight: 900;
+            margin: 20px 0;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255, 107, 53, 0.8); }
+            to { text-shadow: 0 0 40px rgba(255, 107, 53, 1), 0 0 80px rgba(255, 107, 53, 0.5); }
+        }
+
+        .winner-subtitle {
+            color: #888;
+            font-style: italic;
+            margin: 15px 0;
+            font-size: 1rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .close-modal {
+            padding: 15px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            background: transparent;
+            color: #eae0cd;
+            border: 2px solid #eae0cd;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            background: #eae0cd;
+            color: #0a0a0f;
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #444;
+            font-size: 0.75rem;
+            z-index: 10;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .game-image {
+                display: none;
+            }
+            .wheel-container {
+                width: 320px;
+                height: 320px;
+            }
+            .wheel-glow {
+                width: 360px;
+                height: 360px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stripe-overlay"></div>
+
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpRaCvZtVXZ8LlrS6AiUhAJvTke3gnstv_Yg&s" 
+         alt="ARC Raiders" class="game-image left">
+    <img src="https://www.goclecd.fr/wp-content/uploads/ARCRaidersXboxX-1.webp" 
+         alt="ARC Raiders" class="game-image right">
+
+    <div class="header">
+        <h1 class="game-title">ARC RAIDERS</h1>
+    </div>
+
+    <div class="question-box">
+        <h2 class="question">🤖 Qui doit acheter ARC Raiders ? 🤖</h2>
+    </div>
+
+    <div class="container">
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="wheel-glow"></div>
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+            </div>
+            <button class="spin-button" id="spinBtn" onclick="spin()">🎰 LANCER LA ROUE 🎰</button>
+        </div>
+
+        <div class="info-panel">
+            <h2>👥 Candidats potentiels</h2>
+            <div class="participant-list" id="participantList"></div>
+            <div class="disclaimer">
+                <p class="warning">⚠️ SYSTÈME 100% ÉQUITABLE ⚠️</p>
+                <p>Utilise une technologie quantique ultra-avancée*</p>
+                <p class="small">*Totalement truqué pour qu'Adrien paye</p>
+                <p class="huissier">⚖️ Tirage effectué sous le contrôle de Maître Jean-Philippe Durand, huissier de justice. En ouvrant cette page, vous acceptez de manière irrévocable et définitive le résultat du tirage. Aucun recours possible.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🎮 Les machines ARC ne vont pas se combattre toutes seules ! 🎮</p>
+    </div>
+
+    <div class="winner-modal" id="winnerModal">
+        <div class="winner-wrapper">
+            <div class="winner-content">
+                <h1>🎉 L'élu qui doit acheter ARC Raiders est... 🎉</h1>
+                <div class="winner-name" id="winnerName"></div>
+                <p class="winner-subtitle" id="winnerSubtitle"></p>
+                <button class="close-modal" id="closeBtn" onclick="closeModal()">🔄 Re-tenter sa chance</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Seulement Adrien, plusieurs fois avec des variations humoristiques
+        const names = [
+            'Adrien', 'ADRIEN', 'Adrien', 'ADRIEN',
+            'Adrien', 'ADRIEN', 'Adrien', 'ADRIEN'
+        ];
+
+        // Phrases humoristiques qui changent à chaque tirage
+        const subtitles = [
+            '"Quelle surprise ! Personne ne s\'y attendait !" — Tout le monde sauf Adrien',
+            '"Le hasard fait bien les choses." — Maître Durand, huissier de justice',
+            '"Je commence à voir un pattern..." — Adrien, probablement',
+            '"Les probabilités étaient de 100%. Comme prévu." — La Science',
+            '"C\'est la 47ème fois qu\'on fait ce tirage. Même résultat." — Les statistiques',
+            '"À ce stade, c\'est du harcèlement algorithmique." — Adrien',
+            '"L\'univers a parlé. Et il a dit Adrien." — Stephen Hawking, sûrement',
+            '"Encore ?!" — Adrien, à chaque fois',
+            '"La roue a tourné. Le destin d\'Adrien aussi." — Confucius du gaming',
+            '"On a vérifié 3 fois. C\'est bien Adrien." — L\'équipe technique',
+            '"Même en parallèle, dans tous les univers, c\'est Adrien." — Marvel',
+            '"Je vais finir par croire que c\'est fait exprès." — Adrien, naïf'
+        ];
+
+        const buttonTexts = [
+            '🔄 Re-tenter sa chance',
+            '🔄 Réessayer quand même',
+            '🔄 Une dernière fois...',
+            '🔄 OK mais là c\'est la bonne',
+            '🔄 Allez, encore un tour',
+            '🔄 Cette fois c\'est différent',
+            '🔄 Je sens que ça va changer',
+            '🔄 Pourquoi pas',
+            '🔄 L\'espoir fait vivre',
+            '🔄 Adrien va être content'
+        ];
+
+        let spinCount = 0;
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // Couleurs arc-en-ciel style ARC Raiders
+        const colors = [
+            '#ff4444', '#ff6644', '#ff8844', '#ffaa44',
+            '#ffcc44', '#88cc44', '#44aa88', '#4488ff'
+        ];
+
+        // Générer des particules d'arrière-plan
+        function createParticles() {
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 180;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const segmentAngle = (Math.PI * 2) / names.length;
+
+            names.forEach((name, index) => {
+                const startAngle = index * segmentAngle - Math.PI / 2;
+                const endAngle = startAngle + segmentAngle;
+
+                // Dessiner le segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                // Remplir avec la couleur
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+
+                // Ajouter une bordure
+                ctx.strokeStyle = 'rgba(234, 224, 205, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ajouter le texte
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + segmentAngle / 2);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#0a0a0f";
+                ctx.font = "bold 16px 'Orbitron', sans-serif";
+                ctx.shadowColor = "rgba(255,255,255,0.3)";
+                ctx.shadowBlur = 2;
+                ctx.fillText(name, radius * 0.65, 0);
+                ctx.restore();
+            });
+
+            // Dessiner le cercle central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 35, 0, Math.PI * 2);
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fill();
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Texte central
+            ctx.fillStyle = '#ff6b35';
+            ctx.font = "bold 14px 'Orbitron', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("ARC", centerX, centerY);
+        }
+
+        function updateParticipantList() {
+            const list = document.getElementById('participantList');
+            list.innerHTML = '';
+
+            // Afficher juste quelques entrées pour l'humour
+            const displayNames = ['Adrien', 'Adrien', 'Adrien', '...', 'Adrien'];
+            
+            displayNames.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                item.style.animationDelay = (index * 0.1) + 's';
+                item.innerHTML = `<span style="margin-right: 10px;">🎮</span> ${name}`;
+                list.appendChild(item);
+            });
+        }
+
+        function spin() {
+            if (isSpinning) return;
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+
+            const canvas = document.getElementById('wheelCanvas');
+            const spinAngle = Math.random() * 360 + 1440; // Au moins 4 tours
+            currentRotation += spinAngle;
+
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                // Le gagnant est toujours Adrien !
+                showWinner('ADRIEN');
+                createConfetti();
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+            }, 4000);
+        }
+
+        function showWinner(name) {
+            const modal = document.getElementById('winnerModal');
+            const winnerName = document.getElementById('winnerName');
+            const winnerSubtitle = document.getElementById('winnerSubtitle');
+            const closeBtn = document.getElementById('closeBtn');
+            
+            winnerName.textContent = name;
+            
+            // Choisir une phrase aléatoire différente à chaque fois
+            winnerSubtitle.textContent = subtitles[spinCount % subtitles.length];
+            closeBtn.textContent = buttonTexts[spinCount % buttonTexts.length];
+            
+            spinCount++;
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('winnerModal').style.display = 'none';
+        }
+
+        function createConfetti() {
+            const confettiColors = ['#ff4444', '#ff8844', '#ffcc44', '#44ff44', '#4488ff', '#8844ff'];
+
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    confetti.style.width = (5 + Math.random() * 10) + 'px';
+                    confetti.style.height = (5 + Math.random() * 10) + 'px';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3500);
+                }, i * 30);
+            }
+        }
+
+        // Initialisation
+        createParticles();
+        drawWheel();
+        updateParticipantList();
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('winnerModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Easter egg console
+        console.log(`
+╔════════════════════════════════════════════╗
+║   🤖 ARC RAIDERS DECISION SYSTEM 🤖        ║
+║                                            ║
+║   Résultat de l'analyse quantique:         ║
+║   → C'est Adrien qui paye.                 ║
+║                                            ║
+║   Probabilité: 100%                        ║
+║   Marge d'erreur: 0%                       ║
+║   Niveau de surprise d'Adrien: Maximum     ║
+║                                            ║
+║   ⚖️ Certifié par Maître Durand            ║
+╚════════════════════════════════════════════╝
+        `);
+    </script>
+</body>
+
+</html>
