@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue de Sélection d'Animateur - 100% Équitable et Certifiée</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Bandeau huissier */
+        .huissier-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #1a1a2e, #16213e);
+            color: #ffd700;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            z-index: 1000;
+            border-bottom: 3px solid #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .huissier-banner::before {
+            content: '⚖️';
+            font-size: 24px;
+        }
+
+        .huissier-banner::after {
+            content: '⚖️';
+            font-size: 24px;
+        }
+
+        .certification-badge {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            color: #1a1a2e;
+            font-weight: bold;
+            text-align: center;
+            transform: rotate(15deg);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .certification-badge .stamp {
+            font-size: 24px;
+            color: #c0392b;
+        }
+
+        /* Particules animées en arrière-plan */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            z-index: 10;
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .wheel-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+        }
+
+        /* Effet de halo lumineux */
+        .wheel-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Flèche indicatrice */
+        .pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid #FFD700;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+            z-index: 10;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* Bouton de lancement */
+        .spin-button {
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .spin-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spin-button:hover::before {
+            left: 100%;
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Panel de gestion des noms */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .disclaimer {
+            background: #f8f9fa;
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .name-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .name-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: all 0.3s;
+            animation: slideIn 0.4s ease-out;
+            gap: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .name-item label {
+            flex: 1;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Effet de confettis */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f39c12;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Modal de résultat */
+        .winner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .winner-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 600px;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .winner-content h1 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .winner-name {
+            font-size: 64px;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 30px 0;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #ffd700, 0 0 30px #ffd700;
+            }
+            to {
+                text-shadow: 0 0 20px #fff, 0 0 30px #ffd700, 0 0 40px #ffd700;
+            }
+        }
+
+        .winner-comment {
+            color: white;
+            font-size: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .legal-notice {
+            color: rgba(255,255,255,0.7);
+            font-size: 11px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .close-modal {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: white;
+            color: #764ba2;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-legal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.6);
+            padding: 10px;
+            text-align: center;
+            font-size: 10px;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="huissier-banner">
+        Tirage au sort réalisé sous le contrôle de Maître Jean-Pierre TRUCMUCHE, Huissier de Justice - Procès verbal n°2024-RGS-001 - Transparence garantie à 100%*
+    </div>
+
+    <div class="certification-badge">
+        <div class="stamp">✓</div>
+        <div>CERTIFIÉ</div>
+        <div>ÉQUITABLE</div>
+        <div style="font-size: 8px; margin-top: 5px;">*voir conditions</div>
+    </div>
+
+    <div class="container">
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="wheel-glow"></div>
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="450" height="450"></canvas>
+            </div>
+            <button class="spin-button" id="spinBtn" onclick="spin()">🎯 LANCER LA ROUE 🎯</button>
+        </div>
+
+        <div class="control-panel">
+            <h2>👥 Participants</h2>
+            <div class="disclaimer">
+                ⚠️ Liste des participants validée par huissier. Toute ressemblance avec des personnes existantes serait purement fortuite et totalement pas fait exprès.
+            </div>
+            <div class="name-list" id="nameList"></div>
+            <p style="text-align: center; color: #666; font-size: 12px; margin-top: 15px;">
+                📋 Liste scellée - Modification impossible<br>
+                <span style="font-size: 10px;">(C'est pas comme si on avait quelque chose à cacher)</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="winner-modal" id="winnerModal">
+        <div class="winner-content">
+            <h1>🎉 RÉSULTAT OFFICIEL 🎉</h1>
+            <p style="color: rgba(255,255,255,0.8);">Après un tirage au sort 100% aléatoire et impartial...</p>
+            <div class="winner-name" id="winnerName"></div>
+            <div class="winner-comment" id="winnerComment"></div>
+            <div class="legal-notice">
+                * Ce tirage a été effectué dans les règles de l'art, sous contrôle d'huissier fictif.<br>
+                Aucun Régis n'a été maltraité pendant ce tirage.<br>
+                Les autres participants (Régis, Régis et Régis) acceptent le résultat avec fair-play.<br>
+                <br>
+                📜 Procès-verbal disponible sur demande (délai: 47 ans)
+            </div>
+            <button class="close-modal" onclick="closeModal()">Accepter mon destin</button>
+        </div>
+    </div>
+
+    <div class="footer-legal">
+        * La garantie de transparence ne garantit pas l'absence de Régis. Tous droits réservés. Ne pas jeter sur la voie publique. 
+        Tirage effectué par un algorithme certifié ISO-REGIS-9001. En cas de désaccord, le Régis a toujours raison.
+    </div>
+
+    <script>
+        // Liste TOTALEMENT variée et diversifiée de participants
+        const names = [
+            'Régis', 
+            'Régis', 
+            'Régis', 
+            'Régis', 
+            'Régis', 
+            'Régis', 
+            'Régis', 
+            'Régis',
+            'Régis',
+            'Régis'
+        ];
+
+        // Noms affichés - Une sélection TRÈS diversifiée de candidats
+        const displayNames = [
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis',
+            'Régis'
+        ];
+
+        // Commentaires drôles pour le résultat
+        const comments = [
+            "🎰 Incroyable ! Personne ne s'y attendait ! (enfin presque personne)",
+            "📊 Les statisticiens sont formels : c'était totalement imprévisible !",
+            "🔮 Même Madame Irma n'avait pas vu ça venir... ou peut-être que si ?",
+            "🎲 Le hasard fait vraiment bien les choses ! Quel coup de chance !",
+            "⚡ PLOT TWIST : C'est Régis ! Qui l'eût cru ?!",
+            "🏆 Après une compétition acharnée entre tous les candidats...",
+            "🎭 Et c'est le candidat mystère qui l'emporte ! Oh wait...",
+            "📈 Probabilité de ce résultat : 100%... euh pardon, on voulait dire imprévisible !",
+            "🌟 Le destin a parlé ! (et il avait l'accent du Sud)",
+            "🎪 TADA ! Le grand gagnant de cette loterie très équitable !",
+            "🦸 Le héros dont on avait besoin, mais pas celui qu'on méritait !",
+            "👑 ALL HAIL RÉGIS ! Le peuple a choisi ! (enfin, la roue)",
+            "🎵 'I Will Always Love You' - La roue à Régis",
+            "🚀 Houston, we have a Régis !",
+            "💫 C'est écrit dans les étoiles ! (et aussi dans le code source)"
+        ];
+
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // Couleurs pour les segments (toutes différentes pour faire croire à la variété)
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#BB8FCE', '#85C1E2'
+        ];
+
+        // Générer des particules d'arrière-plan
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 200;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const sliceAngle = (2 * Math.PI) / displayNames.length;
+
+            displayNames.forEach((name, index) => {
+                const startAngle = index * sliceAngle - Math.PI / 2;
+                const endAngle = startAngle + sliceAngle;
+
+                // Dessiner le segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                // Remplir avec la couleur
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.fill();
+
+                // Ajouter une bordure blanche
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ajouter le texte
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = "center";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 14px Arial";
+                ctx.shadowColor = "rgba(0,0,0,0.5)";
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                
+                // Afficher le nom sur deux lignes si nécessaire
+                const words = name.split(' ');
+                if (words.length > 1 && name.length > 10) {
+                    ctx.fillText(words[0], radius * 0.65, -5);
+                    ctx.fillText(words.slice(1).join(' '), radius * 0.65, 12);
+                } else {
+                    ctx.fillText(name, radius * 0.65, 5);
+                }
+                ctx.restore();
+            });
+
+            // Dessiner le cercle central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 35, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Texte central
+            ctx.fillStyle = '#764ba2';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('RÉGIS', centerX, centerY - 5);
+            ctx.fillText('ROULETTE', centerX, centerY + 10);
+        }
+
+        function updateNameList() {
+            const list = document.getElementById('nameList');
+            list.innerHTML = '';
+
+            displayNames.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'name-item';
+
+                const label = document.createElement('label');
+                label.textContent = `${index + 1}. ${name}`;
+
+                item.appendChild(label);
+                list.appendChild(item);
+            });
+        }
+
+        function spin() {
+            if (isSpinning) return;
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+
+            const canvas = document.getElementById('wheelCanvas');
+            const spinAngle = Math.random() * 360 + 1440; // Au moins 4 tours
+            currentRotation += spinAngle;
+
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                // SURPRISE ! C'est Régis ! (qui l'eût cru ?)
+                const randomComment = comments[Math.floor(Math.random() * comments.length)];
+                showWinner('RÉGIS', randomComment);
+                createConfetti();
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+            }, 4000);
+        }
+
+        function showWinner(name, comment) {
+            const modal = document.getElementById('winnerModal');
+            const winnerName = document.getElementById('winnerName');
+            const winnerComment = document.getElementById('winnerComment');
+            
+            winnerName.textContent = name;
+            winnerComment.textContent = comment;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('winnerModal').style.display = 'none';
+        }
+
+        function createConfetti() {
+            const confettiColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD', '#ffd700'];
+
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    
+                    // Formes variées de confettis
+                    if (Math.random() > 0.5) {
+                        confetti.style.borderRadius = '50%';
+                    }
+                    confetti.style.width = (5 + Math.random() * 10) + 'px';
+                    confetti.style.height = (5 + Math.random() * 10) + 'px';
+                    
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3500);
+                }, i * 20);
+            }
+        }
+
+        // Initialisation
+        createParticles();
+        drawWheel();
+        updateNameList();
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.onclick = function (event) {
+            const modal = document.getElementById('winnerModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Easter egg : message dans la console
+        console.log("🕵️ Hey ! Tu regardes le code source ?");
+        console.log("📋 Liste officielle des participants :");
+        console.log("   1. Régis");
+        console.log("   2. Régis"); 
+        console.log("   3. Régis");
+        console.log("   4. Régis");
+        console.log("   5. Régis");
+        console.log("   6. Régis");
+        console.log("   7. Régis");
+        console.log("   8. Régis");
+        console.log("   9. Régis");
+        console.log("   10. Régis");
+        console.log("🤷 C'est une coïncidence, on te jure !");
+    </script>
+</body>
+
+</html>
