@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roue de Sélection d'Animateur</title>
+    <title>Roue de l'Animateur de la Semaine</title>
     <style>
         * {
             margin: 0;
@@ -12,95 +11,235 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-1: #667eea;
+            --bg-2: #764ba2;
+            --accent-1: #f093fb;
+            --accent-2: #f5576c;
+            --gold: #ffd700;
+            --panel: rgba(255, 255, 255, 0.94);
+            --panel-soft: rgba(255, 255, 255, 0.15);
+            --text-dark: #30244f;
+            --text-light: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.28);
+        }
+
+        body.theme-cosmic {
+            --bg-1: #1f1c2c;
+            --bg-2: #928dab;
+            --accent-1: #43cea2;
+            --accent-2: #185a9d;
+            --gold: #9dfcff;
+        }
+
+        body.theme-casino {
+            --bg-1: #0f2027;
+            --bg-2: #203a43;
+            --accent-1: #f7971e;
+            --accent-2: #ffd200;
+            --gold: #ffe66d;
+        }
+
+        body.theme-meeting {
+            --bg-1: #243b55;
+            --bg-2: #141e30;
+            --accent-1: #00c6ff;
+            --accent-2: #0072ff;
+            --gold: #b3e5ff;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-light);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 24%),
+                radial-gradient(circle at 80% 15%, rgba(255,255,255,0.12), transparent 22%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            pointer-events: none;
+        }
+
+        .particle {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 50%;
+            animation: float 16s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) translateX(0) scale(0.6); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translateY(-20vh) translateX(120px) scale(1.3); opacity: 0; }
+        }
+
+        .page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border: 1px solid rgba(255,255,255,0.26);
+            background: rgba(255,255,255,0.12);
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+            font-weight: 700;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+        }
+
+        h1 {
+            margin-top: 18px;
+            font-size: clamp(34px, 5vw, 64px);
+            line-height: 1;
+            letter-spacing: -1.5px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.28);
+        }
+
+        .subtitle {
+            margin-top: 12px;
+            font-size: clamp(16px, 2vw, 22px);
+            opacity: 0.9;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: minmax(360px, 1fr) 390px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .stage, .control-panel {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 32px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+            backdrop-filter: blur(18px);
+        }
+
+        .stage {
+            padding: 28px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             overflow: hidden;
             position: relative;
         }
 
-        /* Particules animées en arrière-plan */
-        .particle {
+        .stage::after {
+            content: "";
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.8);
+            width: 260px;
+            height: 260px;
+            right: -70px;
+            top: -80px;
             border-radius: 50%;
-            animation: float 15s infinite;
+            background: rgba(255,255,255,0.08);
+            pointer-events: none;
         }
 
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
-
-        .container {
-            display: flex;
-            gap: 40px;
+        .status-card {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
             align-items: center;
-            z-index: 10;
-            position: relative;
+            padding: 16px 18px;
+            margin-bottom: 18px;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
         }
 
-        .wheel-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
+        .status-title {
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .status-text {
+            margin-top: 4px;
+            opacity: 0.86;
+            font-size: 14px;
+        }
+
+        .week-pill {
+            white-space: nowrap;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border-radius: 999px;
+            font-weight: 900;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.22);
         }
 
         .wheel-container {
             position: relative;
-            width: 450px;
-            height: 450px;
+            width: min(470px, 82vw);
+            height: min(470px, 82vw);
+            margin: 18px 0 24px;
         }
 
-        /* Effet de halo lumineux */
         .wheel-glow {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-            animation: pulse 2s ease-in-out infinite;
-            pointer-events: none;
+            inset: -26px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.28), transparent 68%);
+            animation: pulse 2.4s ease-in-out infinite;
         }
 
         @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.55; }
+            50% { transform: scale(1.08); opacity: 0.85; }
+        }
 
-            0%,
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-            }
+        .pointer {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 28px solid transparent;
+            border-right: 28px solid transparent;
+            border-top: 58px solid var(--gold);
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+            z-index: 5;
+        }
 
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 0.5;
-            }
+        .pointer.spinning {
+            animation: pointerShake 0.12s linear infinite;
+        }
+
+        @keyframes pointerShake {
+            0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+            50% { transform: translateX(-50%) rotate(2deg); }
         }
 
         #wheelCanvas {
@@ -108,418 +247,615 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
-                inset 0 0 40px rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 28px 80px rgba(0,0,0,0.36),
+                inset 0 0 40px rgba(255,255,255,0.14);
+            transition: transform 4.6s cubic-bezier(0.10, 0.78, 0.12, 1);
         }
 
-        /* Flèche indicatrice */
-        .pointer {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 25px solid transparent;
-            border-right: 25px solid transparent;
-            border-top: 50px solid #FFD700;
-            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
-            z-index: 10;
-            animation: bounce 1s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateX(-50%) translateY(0);
-            }
-
-            50% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-        }
-
-        /* Bouton de lancement */
         .spin-button {
-            padding: 20px 50px;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
             border: none;
-            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 18px 38px;
+            border-radius: 999px;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            font-size: clamp(18px, 2vw, 24px);
+            font-weight: 950;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+            transition: transform 0.22s, box-shadow 0.22s, opacity 0.22s;
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .spin-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .spin-button:active {
-            transform: translateY(0) scale(0.98);
         }
 
         .spin-button::before {
-            content: '';
+            content: "";
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
+            inset: 0;
+            transform: translateX(-110%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            transition: transform 0.65s;
         }
 
         .spin-button:hover::before {
-            left: 100%;
+            transform: translateX(110%);
+        }
+
+        .spin-button:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 24px 55px rgba(0,0,0,0.34);
         }
 
         .spin-button:disabled {
-            opacity: 0.6;
             cursor: not-allowed;
+            opacity: 0.72;
         }
 
-        /* Panel de gestion des noms */
+        .spin-button.shake {
+            animation: buttonShake 0.35s;
+        }
+
+        @keyframes buttonShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .ritual {
+            min-height: 26px;
+            margin-top: 16px;
+            font-weight: 800;
+            opacity: 0.92;
+            text-align: center;
+        }
+
         .control-panel {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            backdrop-filter: blur(10px);
+            padding: 24px;
+            color: var(--text-dark);
+            background: var(--panel);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
         .control-panel h2 {
-            color: #764ba2;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 28px;
+            color: var(--text-dark);
+            font-size: 26px;
         }
 
-        .controls-section {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .randomize-button {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
+        .theme-select {
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 2px solid rgba(118,75,162,0.18);
+            background: white;
+            color: var(--text-dark);
+            font-weight: 800;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin-bottom: 15px;
         }
 
-        .randomize-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        .controls-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .small-button {
+            border: none;
+            border-radius: 14px;
+            padding: 11px 12px;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .small-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.18);
         }
 
         .name-list {
-            max-height: 300px;
+            max-height: 390px;
             overflow-y: auto;
-            margin-bottom: 20px;
+            padding-right: 4px;
         }
 
         .name-item {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
             align-items: center;
-            padding: 12px;
-            margin: 8px 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            transition: all 0.3s;
-            animation: slideIn 0.4s ease-out;
-            gap: 10px;
+            padding: 13px;
+            margin: 10px 0;
+            color: white;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+            animation: slideIn 0.32s ease-out;
+            transition: transform 0.2s, opacity 0.2s, filter 0.2s;
+        }
+
+        .name-item:hover {
+            transform: translateX(4px) scale(1.01);
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .name-item.excluded {
-            background: #e0e0e0;
-            opacity: 0.6;
+            opacity: 0.48;
+            filter: grayscale(0.75);
         }
 
         .name-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 21px;
+            height: 21px;
+            accent-color: var(--accent-2);
             cursor: pointer;
         }
 
-        .name-item label {
-            flex: 1;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
+        .participant-main {
+            min-width: 0;
         }
 
-        .name-item.excluded label {
-            color: #666;
-            text-decoration: line-through;
+        .participant-name {
+            font-weight: 950;
+            font-size: 17px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .participant-meta {
+            margin-top: 3px;
+            font-size: 12px;
+            opacity: 0.84;
         }
 
         .weight-controls {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .weight-button {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border: none;
             border-radius: 50%;
-            background: white;
-            color: #764ba2;
+            background: rgba(255,255,255,0.95);
+            color: var(--text-dark);
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 950;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .weight-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .weight-button:active {
-            transform: scale(0.95);
         }
 
         .weight-display {
-            min-width: 30px;
+            min-width: 32px;
             text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .name-item.excluded .weight-button,
-        .name-item.excluded .weight-display {
-            opacity: 0.5;
-            pointer-events: none;
+            font-weight: 950;
         }
 
         .add-name-section {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .add-name-input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #764ba2;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px solid rgba(118,75,162,0.24);
+            border-radius: 14px;
+            font-size: 15px;
         }
 
         .add-name-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 4px rgba(245, 87, 108, 0.14);
         }
 
         .add-button {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             border: none;
-            border-radius: 10px;
+            padding: 13px 18px;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            font-weight: 950;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
         }
 
-        .add-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        .footer-note {
+            margin-top: 14px;
+            font-size: 12px;
+            color: rgba(48,36,79,0.68);
+            line-height: 1.4;
         }
 
-        /* Effet de confettis */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #f39c12;
-            animation: confetti-fall 3s linear forwards;
-        }
-
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* Modal de résultat */
         .winner-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
             display: none;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.75);
             z-index: 1000;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.35s;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .winner-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 50px;
-            border-radius: 30px;
+            width: min(620px, 100%);
+            padding: 42px;
             text-align: center;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
-            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-radius: 34px;
+            color: white;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.23), transparent 42%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            box-shadow: 0 34px 100px rgba(0,0,0,0.5);
+            animation: scaleIn 0.48s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         @keyframes scaleIn {
-            from {
-                transform: scale(0);
-            }
-
-            to {
-                transform: scale(1);
-            }
+            from { transform: scale(0.72); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        .winner-content h1 {
-            color: white;
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        .winner-kicker {
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.88;
+        }
+
+        .winner-content h2 {
+            margin-top: 12px;
+            font-size: clamp(30px, 5vw, 50px);
+            line-height: 1.05;
         }
 
         .winner-name {
-            font-size: 64px;
-            color: #ffd700;
-            font-weight: bold;
-            margin: 30px 0;
-            animation: glow 2s ease-in-out infinite alternate;
+            margin: 26px 0 16px;
+            font-size: clamp(48px, 10vw, 86px);
+            color: var(--gold);
+            font-weight: 1000;
+            text-transform: uppercase;
+            text-shadow: 0 0 22px rgba(255,255,255,0.65);
+            animation: glow 1.7s ease-in-out infinite alternate;
         }
 
         @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #fff, 0 0 20px #ffd700, 0 0 30px #ffd700;
-            }
+            from { transform: scale(1); filter: brightness(1); }
+            to { transform: scale(1.035); filter: brightness(1.18); }
+        }
 
-            to {
-                text-shadow: 0 0 20px #fff, 0 0 30px #ffd700, 0 0 40px #ffd700;
-            }
+        .winner-quote {
+            min-height: 26px;
+            font-size: 19px;
+            font-weight: 800;
+            opacity: 0.95;
+        }
+
+        .mission-card {
+            margin: 24px auto 0;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            font-weight: 800;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .close-modal, .copy-button {
+            border: none;
+            padding: 14px 22px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 950;
+            font-size: 16px;
         }
 
         .close-modal {
-            padding: 15px 40px;
-            font-size: 20px;
             background: white;
-            color: #764ba2;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-            font-weight: bold;
+            color: var(--text-dark);
         }
 
-        .close-modal:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        .copy-button {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 11px;
+            height: 11px;
+            top: -20px;
+            z-index: 1100;
+            animation: confettiFall 3.2s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-40px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(760deg); opacity: 0; }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%) translateY(80px);
+            padding: 12px 18px;
+            border-radius: 999px;
+            color: white;
+            background: rgba(0,0,0,0.72);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            font-weight: 800;
+            z-index: 1200;
+            transition: transform 0.25s;
+        }
+
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 920px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+
+            .control-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                width: min(100% - 20px, 1200px);
+                padding: 18px 0;
+            }
+
+            .stage, .control-panel {
+                border-radius: 24px;
+                padding: 18px;
+            }
+
+            .status-card {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-row {
+                grid-template-columns: 1fr;
+            }
+
+            .name-item {
+                grid-template-columns: auto 1fr;
+            }
+
+            .weight-controls {
+                grid-column: 2;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="wheel-section">
-            <div class="wheel-container">
-                <div class="wheel-glow"></div>
-                <div class="pointer"></div>
-                <canvas id="wheelCanvas" width="450" height="450"></canvas>
-            </div>
-            <button class="spin-button" id="spinBtn" onclick="spin()">🎯 LANCER LA ROUE 🎯</button>
-        </div>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-badge">Rituel d'équipe hebdomadaire</div>
+            <h1>Qui animera les réunions cette semaine ?</h1>
+            <p class="subtitle">La roue tourne. Le destin parle. Le micro change de main.</p>
+        </section>
 
-        <div class="control-panel">
-            <h2>👥 Participants</h2>
-            <div class="controls-section">
-                <button class="randomize-button" onclick="randomizeOrder()">🔀 Mélanger l'ordre</button>
+        <section class="app">
+            <div class="stage">
+                <div class="status-card">
+                    <div>
+                        <div class="status-title" id="statusTitle">Prêt pour le tirage</div>
+                        <div class="status-text" id="statusText">Coche les présents, puis lance la cérémonie.</div>
+                    </div>
+                    <div class="week-pill" id="weekPill">Semaine</div>
+                </div>
+
+                <div class="wheel-container">
+                    <div class="wheel-glow"></div>
+                    <div class="pointer" id="pointer"></div>
+                    <canvas id="wheelCanvas" width="470" height="470"></canvas>
+                </div>
+
+                <button class="spin-button" id="spinBtn" onclick="spin()">Lancer le tirage</button>
+                <div class="ritual" id="ritualText">Que le meilleur facilitateur gagne.</div>
             </div>
-            <div class="name-list" id="nameList"></div>
-            <div class="add-name-section">
-                <input type="text" class="add-name-input" id="newName" placeholder="Ajouter un nom..."
-                    onkeypress="if(event.key==='Enter') addName()">
-                <button class="add-button" onclick="addName()">Ajouter</button>
-            </div>
-        </div>
-    </div>
+
+            <aside class="control-panel">
+                <div class="panel-header">
+                    <h2>Équipe</h2>
+                    <select class="theme-select" id="themeSelect" onchange="changeTheme(this.value)">
+                        <option value="arcade">Arcade</option>
+                        <option value="cosmic">Cosmique</option>
+                        <option value="casino">Casino</option>
+                        <option value="meeting">Réunion+</option>
+                    </select>
+                </div>
+
+                <div class="controls-row">
+                    <button class="small-button" onclick="randomizeOrder()">Mélanger</button>
+                    <button class="small-button" onclick="resetParticipants()"> Réinitialiser</button>
+                </div>
+
+                <div class="name-list" id="nameList"></div>
+
+                <div class="add-name-section">
+                    <input
+                        type="text"
+                        class="add-name-input"
+                        id="newName"
+                        placeholder="Ajouter un prénom..."
+                        onkeypress="if(event.key === 'Enter') addName()"
+                    >
+                    <button class="add-button" onclick="addName()">Ajouter</button>
+                </div>
+
+                <p class="footer-note">
+                    Tout est sauvegardé dans le navigateur avec localStorage. Aucun backend requis, donc compatible avec GitHub Pages.
+                </p>
+            </aside>
+        </section>
+    </main>
 
     <div class="winner-modal" id="winnerModal">
         <div class="winner-content">
-            <h1>🎉 L'animateur sera 🎉</h1>
+            <div class="winner-kicker">Cette semaine, le micro est pour</div>
+            <h2>Notre animateur ou animatrice</h2>
             <div class="winner-name" id="winnerName"></div>
-            <button class="close-modal" onclick="closeModal()">Fermer</button>
+            <div class="winner-quote" id="winnerQuote"></div>
+            <div class="mission-card" id="missionCard"></div>
+            <div class="modal-actions">
+                <button class="copy-button" onclick="copyResult()">Copier le message</button>
+                <button class="close-modal" onclick="closeModal()">Fermer</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        let names = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
-        let nameWeights = {}; // Objet pour stocker les poids de chaque nom
-        
-        // Initialiser les poids à 1 pour tous les noms
-        names.forEach(name => {
-            nameWeights[name] = 1;
-        });
+    <div class="toast" id="toast">Copié !</div>
 
-        let activeNames = [...names];
-        let shuffledActiveNames = [...activeNames];
+    <script>
+        const defaultNames = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
+        const participantEmojis = ['', '', '', '', '', '', '', '', '', '', '', ''];
+
+        const wheelColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#BB8FCE', '#85C1E2', '#F8B739', '#52D681'
+        ];
+
+        const ritualSteps = [
+            'Mélange des participants...',
+            'Consultation du karma de réunion...',
+            'Alignement des agendas...',
+            'La roue prend une décision importante...',
+            'Suspense dans le canal équipe...'
+        ];
+
+        const winnerQuotes = [
+            'Il n’a rien demandé, mais la roue a parlé.',
+            'Le destin a choisi son maître de cérémonie.',
+            'Une grande responsabilité commence maintenant.',
+            'La réunion est entre de bonnes mains. Normalement.',
+            'Le micro est chaud, le chrono est prêt.',
+            'La légende raconte que cette personne était préparée.'
+        ];
+
+        const missions = [
+            'Mission : faire respecter le timing sans perdre le sourire.',
+            'Mission : donner la parole à tout le monde, même aux discrets.',
+            'Mission : obtenir au moins une décision claire avant la fin.',
+            'Mission : commencer à l’heure et finir encore plus à l’heure.',
+            'Mission : transformer les discussions floues en actions nettes.',
+            'Mission : garder l’énergie haute et les digressions basses.'
+        ];
+
+        let names = [];
+        let nameWeights = {};
+        let activeNames = [];
+        let shuffledActiveNames = [];
         let isSpinning = false;
         let currentRotation = 0;
+        let lastWinner = '';
+        let lastMission = '';
+        let lastQuote = '';
+        let ritualInterval = null;
 
-        // Fonction pour mélanger un tableau (algorithme Fisher-Yates)
+        function saveState() {
+            const state = {
+                names,
+                nameWeights,
+                activeNames,
+                theme: document.getElementById('themeSelect').value
+            };
+            localStorage.setItem('weeklyWheelState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('weeklyWheelState');
+            if (!saved) {
+                names = [...defaultNames];
+                nameWeights = {};
+                names.forEach(name => nameWeights[name] = 1);
+                activeNames = [...names];
+                return;
+            }
+
+            try {
+                const state = JSON.parse(saved);
+                names = Array.isArray(state.names) && state.names.length ? state.names : [...defaultNames];
+                nameWeights = state.nameWeights || {};
+                names.forEach(name => {
+                    if (!nameWeights[name]) nameWeights[name] = 1;
+                });
+                activeNames = Array.isArray(state.activeNames) ? state.activeNames.filter(name => names.includes(name)) : [...names];
+
+                if (state.theme) {
+                    document.body.className = state.theme === 'arcade' ? '' : `theme-${state.theme}`;
+                    setTimeout(() => document.getElementById('themeSelect').value = state.theme, 0);
+                }
+            } catch (error) {
+                names = [...defaultNames];
+                nameWeights = {};
+                names.forEach(name => nameWeights[name] = 1);
+                activeNames = [...names];
+            }
+        }
+
+        function getWeekNumber(date = new Date()) {
+            const tempDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNumber = tempDate.getUTCDay() || 7;
+            tempDate.setUTCDate(tempDate.getUTCDate() + 4 - dayNumber);
+            const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
+            return Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function updateWeekPill() {
+            document.getElementById('weekPill').textContent = `Semaine ${getWeekNumber()}`;
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 58; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 16 + 's';
+                particle.style.animationDuration = (13 + Math.random() * 11) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -529,117 +865,121 @@
             return shuffled;
         }
 
-        // Fonction pour mélanger l'ordre des noms
         function randomizeOrder() {
             shuffledActiveNames = shuffleArray(activeNames);
             drawWheel();
+            setRitualText('Ordre mélangé. Le hasard est prêt.');
         }
 
-        // Fonction pour augmenter le poids
+        function changeTheme(theme) {
+            document.body.className = theme === 'arcade' ? '' : `theme-${theme}`;
+            saveState();
+        }
+
         function increaseWeight(name) {
             if (nameWeights[name] < 20) {
                 nameWeights[name]++;
                 updateNameList();
                 drawWheel();
+                saveState();
             }
         }
 
-        // Fonction pour diminuer le poids
         function decreaseWeight(name) {
             if (nameWeights[name] > 1) {
                 nameWeights[name]--;
                 updateNameList();
                 drawWheel();
+                saveState();
             }
         }
-
-        // Générer des particules d'arrière-plan
-        function createParticles() {
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-                document.body.appendChild(particle);
-            }
-        }
-
-        // Couleurs vibrantes pour les segments
-        const colors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
-            '#FECA57', '#DDA0DD', '#98D8C8', '#F7DC6F',
-            '#BB8FCE', '#85C1E2', '#F8B739', '#52D681'
-        ];
 
         function drawWheel() {
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 200;
+            const radius = 210;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (shuffledActiveNames.length === 0) {
+                ctx.fillStyle = 'rgba(255,255,255,0.92)';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+
                 ctx.fillStyle = '#764ba2';
-                ctx.font = 'bold 24px Arial';
+                ctx.font = 'bold 26px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('Ajoutez des participants!', centerX, centerY);
+                ctx.fillText('Aucun participant', centerX, centerY - 10);
+                ctx.font = '16px Arial';
+                ctx.fillText('Coche au moins une personne', centerX, centerY + 25);
                 return;
             }
 
-            // Calculer le total des poids
             const totalWeight = shuffledActiveNames.reduce((sum, name) => sum + nameWeights[name], 0);
-
-            let currentAngle = -Math.PI / 2; // Commencer en haut
+            let currentAngle = -Math.PI / 2;
 
             shuffledActiveNames.forEach((name, index) => {
                 const weight = nameWeights[name];
                 const angleSize = (weight / totalWeight) * Math.PI * 2;
                 const endAngle = currentAngle + angleSize;
 
-                // Dessiner le segment
+                const gradient = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, radius);
+                gradient.addColorStop(0, lightenColor(wheelColors[index % wheelColors.length], 22));
+                gradient.addColorStop(1, wheelColors[index % wheelColors.length]);
+
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, currentAngle, endAngle);
                 ctx.closePath();
-
-                // Remplir avec la couleur
-                ctx.fillStyle = colors[index % colors.length];
+                ctx.fillStyle = gradient;
                 ctx.fill();
 
-                // Ajouter une bordure blanche
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Ajouter le texte
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(currentAngle + angleSize / 2);
-                ctx.textAlign = "center";
-                ctx.fillStyle = "white";
-                ctx.font = "bold 18px Arial";
-                ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 4;
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'white';
+                ctx.font = '900 18px Arial';
+                ctx.shadowColor = 'rgba(0,0,0,0.55)';
+                ctx.shadowBlur = 5;
                 ctx.shadowOffsetX = 2;
                 ctx.shadowOffsetY = 2;
-                ctx.fillText(name, radius * 0.65, 0);
+
+                const displayName = name.length > 12 ? name.slice(0, 11) + '…' : name;
+                ctx.fillText(displayName, radius * 0.64, 0);
                 ctx.restore();
 
                 currentAngle = endAngle;
             });
 
-            // Dessiner le cercle central
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
+            ctx.arc(centerX, centerY, 44, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
             ctx.fill();
-            ctx.strokeStyle = '#764ba2';
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(118,75,162,0.9)';
+            ctx.lineWidth = 5;
             ctx.stroke();
+
+            ctx.fillStyle = '#764ba2';
+            ctx.font = 'bold 25px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('', centerX, centerY + 9);
+        }
+
+        function lightenColor(hex, percent) {
+            const number = parseInt(hex.replace('#', ''), 16);
+            const amount = Math.round(2.55 * percent);
+            const red = Math.min(255, (number >> 16) + amount);
+            const green = Math.min(255, ((number >> 8) & 0x00FF) + amount);
+            const blue = Math.min(255, (number & 0x0000FF) + amount);
+            return `#${(0x1000000 + red * 0x10000 + green * 0x100 + blue).toString(16).slice(1)}`;
         }
 
         function updateNameList() {
@@ -649,9 +989,7 @@
             names.forEach((name, index) => {
                 const item = document.createElement('div');
                 item.className = 'name-item';
-                if (!activeNames.includes(name)) {
-                    item.classList.add('excluded');
-                }
+                if (!activeNames.includes(name)) item.classList.add('excluded');
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
@@ -659,19 +997,30 @@
                 checkbox.checked = activeNames.includes(name);
                 checkbox.onchange = () => toggleName(name);
 
-                const label = document.createElement('label');
-                label.htmlFor = `name-${index}`;
-                label.textContent = name;
+                const main = document.createElement('div');
+                main.className = 'participant-main';
 
-                // Contrôles de poids
+                const participantName = document.createElement('div');
+                participantName.className = 'participant-name';
+                participantName.textContent = `${participantEmojis[index % participantEmojis.length]} ${name}`;
+
+                const participantMeta = document.createElement('div');
+                participantMeta.className = 'participant-meta';
+                participantMeta.textContent = activeNames.includes(name)
+                    ? `Présent · chance x${nameWeights[name]}`
+                    : 'Absent cette semaine';
+
+                main.appendChild(participantName);
+                main.appendChild(participantMeta);
+
                 const weightControls = document.createElement('div');
                 weightControls.className = 'weight-controls';
 
                 const minusBtn = document.createElement('button');
                 minusBtn.className = 'weight-button';
                 minusBtn.textContent = '−';
-                minusBtn.onclick = (e) => {
-                    e.stopPropagation();
+                minusBtn.onclick = event => {
+                    event.stopPropagation();
                     decreaseWeight(name);
                 };
 
@@ -682,8 +1031,8 @@
                 const plusBtn = document.createElement('button');
                 plusBtn.className = 'weight-button';
                 plusBtn.textContent = '+';
-                plusBtn.onclick = (e) => {
-                    e.stopPropagation();
+                plusBtn.onclick = event => {
+                    event.stopPropagation();
                     increaseWeight(name);
                 };
 
@@ -692,7 +1041,7 @@
                 weightControls.appendChild(plusBtn);
 
                 item.appendChild(checkbox);
-                item.appendChild(label);
+                item.appendChild(main);
                 item.appendChild(weightControls);
                 list.appendChild(item);
             });
@@ -706,107 +1055,212 @@
                 activeNames.push(name);
             }
             shuffledActiveNames = shuffleArray(activeNames);
+            updateNameList();
             drawWheel();
+            saveState();
         }
 
         function addName() {
             const input = document.getElementById('newName');
             const name = input.value.trim();
 
-            if (name && !names.includes(name)) {
-                names.push(name);
-                activeNames.push(name);
-                nameWeights[name] = 1; // Initialiser le poids à 1
-                shuffledActiveNames = shuffleArray(activeNames);
-                input.value = '';
-                updateNameList();
-                drawWheel();
+            if (!name) return;
+
+            const alreadyExists = names.some(existingName => existingName.toLowerCase() === name.toLowerCase());
+            if (alreadyExists) {
+                showToast('Ce prénom existe déjà.');
+                return;
             }
+
+            names.push(name);
+            activeNames.push(name);
+            nameWeights[name] = 1;
+            shuffledActiveNames = shuffleArray(activeNames);
+            input.value = '';
+            updateNameList();
+            drawWheel();
+            saveState();
+            showToast(`${name} rejoint la roue.`);
+        }
+
+        function resetParticipants() {
+            names = [...defaultNames];
+            nameWeights = {};
+            names.forEach(name => nameWeights[name] = 1);
+            activeNames = [...names];
+            shuffledActiveNames = shuffleArray(activeNames);
+            updateNameList();
+            drawWheel();
+            saveState();
+            setRitualText('Équipe réinitialisée. Nouveau départ.');
         }
 
         function spin() {
-            if (isSpinning || shuffledActiveNames.length === 0) return;
+            const spinBtn = document.getElementById('spinBtn');
+            const pointer = document.getElementById('pointer');
+
+            if (isSpinning) return;
+
+            if (shuffledActiveNames.length === 0) {
+                spinBtn.classList.add('shake');
+                setRitualText('Impossible de lancer : personne n’est présent.');
+                setTimeout(() => spinBtn.classList.remove('shake'), 400);
+                return;
+            }
 
             isSpinning = true;
-            document.getElementById('spinBtn').disabled = true;
+            spinBtn.disabled = true;
+            spinBtn.textContent = 'La roue décide...';
+            pointer.classList.add('spinning');
+            document.getElementById('statusTitle').textContent = 'Tirage en cours';
+            document.getElementById('statusText').textContent = 'Ne bougez plus. Le destin est en train de calculer.';
+            startRitualMessages();
 
             const canvas = document.getElementById('wheelCanvas');
-            const spinAngle = Math.random() * 360 + 1440;
+            const spinAngle = Math.random() * 360 + 1800 + Math.floor(Math.random() * 5) * 360;
             currentRotation += spinAngle;
-
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
-                const finalAngle = currentRotation % 360;
-                const normalizedAngle = (360 - finalAngle) % 360;
-                
-                // Calculer le total des poids
-                const totalWeight = shuffledActiveNames.reduce((sum, name) => sum + nameWeights[name], 0);
-                
-                // Trouver le gagnant en fonction des poids
-                let accumulatedAngle = 0;
-                let winner = shuffledActiveNames[0];
-                
-                for (const name of shuffledActiveNames) {
-                    const weight = nameWeights[name];
-                    const segmentAngle = (weight / totalWeight) * 360;
-                    accumulatedAngle += segmentAngle;
-                    
-                    if (normalizedAngle < accumulatedAngle) {
-                        winner = name;
-                        break;
-                    }
-                }
+                stopRitualMessages();
+                const winner = getWinnerFromRotation();
+                lastWinner = winner;
+                lastQuote = randomItem(winnerQuotes);
+                lastMission = randomItem(missions);
 
                 showWinner(winner);
                 createConfetti();
+
+                document.getElementById('statusTitle').textContent = `Animateur de la semaine : ${winner}`;
+                document.getElementById('statusText').textContent = lastMission.replace('Mission : ', '');
+                setRitualText('La roue a parlé. Aucun recours possible.');
+
                 isSpinning = false;
-                document.getElementById('spinBtn').disabled = false;
-            }, 4000);
+                spinBtn.disabled = false;
+                spinBtn.textContent = 'Relancer le tirage';
+                pointer.classList.remove('spinning');
+            }, 4600);
+        }
+
+        function getWinnerFromRotation() {
+            const finalAngle = currentRotation % 360;
+            const normalizedAngle = (360 - finalAngle) % 360;
+            const totalWeight = shuffledActiveNames.reduce((sum, name) => sum + nameWeights[name], 0);
+
+            let accumulatedAngle = 0;
+            let winner = shuffledActiveNames[0];
+
+            for (const name of shuffledActiveNames) {
+                const segmentAngle = (nameWeights[name] / totalWeight) * 360;
+                accumulatedAngle += segmentAngle;
+                if (normalizedAngle < accumulatedAngle) {
+                    winner = name;
+                    break;
+                }
+            }
+
+            return winner;
+        }
+
+        function startRitualMessages() {
+            let step = 0;
+            setRitualText(ritualSteps[step]);
+            ritualInterval = setInterval(() => {
+                step = (step + 1) % ritualSteps.length;
+                setRitualText(ritualSteps[step]);
+            }, 850);
+        }
+
+        function stopRitualMessages() {
+            if (ritualInterval) {
+                clearInterval(ritualInterval);
+                ritualInterval = null;
+            }
+        }
+
+        function setRitualText(text) {
+            document.getElementById('ritualText').textContent = text;
         }
 
         function showWinner(name) {
-            const modal = document.getElementById('winnerModal');
-            const winnerName = document.getElementById('winnerName');
-            winnerName.textContent = name;
-            modal.style.display = 'flex';
+            document.getElementById('winnerName').textContent = name;
+            document.getElementById('winnerQuote').textContent = lastQuote;
+            document.getElementById('missionCard').textContent = lastMission;
+            document.getElementById('winnerModal').style.display = 'flex';
         }
 
         function closeModal() {
             document.getElementById('winnerModal').style.display = 'none';
         }
 
-        function createConfetti() {
-            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD'];
+        function copyResult() {
+            const message = `Animateur de la semaine : ${lastWinner}\n${lastMission}`;
 
-            for (let i = 0; i < 100; i++) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(message)
+                    .then(() => showToast('Message copié.'))
+                    .catch(() => fallbackCopy(message));
+            } else {
+                fallbackCopy(message);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+            showToast('Message copié.');
+        }
+
+        function createConfetti() {
+            const confettiColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FECA57', '#DDA0DD', '#52D681', '#ffffff'];
+
+            for (let i = 0; i < 130; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.background = randomItem(confettiColors);
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                    confetti.style.animationDelay = Math.random() * 0.25 + 's';
+                    confetti.style.animationDuration = (2.3 + Math.random() * 1.8) + 's';
                     document.body.appendChild(confetti);
-
-                    setTimeout(() => confetti.remove(), 3500);
-                }, i * 30);
+                    setTimeout(() => confetti.remove(), 4300);
+                }, i * 14);
             }
         }
 
-        // Initialisation
-        createParticles();
-        shuffledActiveNames = shuffleArray(activeNames);
-        drawWheel();
-        updateNameList();
+        function randomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
 
-        // Fermer le modal en cliquant à l'extérieur
-        window.onclick = function (event) {
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 1800);
+        }
+
+        window.onclick = function(event) {
             const modal = document.getElementById('winnerModal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
+            if (event.target === modal) closeModal();
+        };
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeModal();
+        });
+
+        loadState();
+        createParticles();
+        updateWeekPill();
+        shuffledActiveNames = shuffleArray(activeNames);
+        updateNameList();
+        drawWheel();
     </script>
 </body>
-
 </html>
