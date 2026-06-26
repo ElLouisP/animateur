@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roue de l'Animateur de la Semaine</title>
+    <title>Roue de l'Animateur</title>
     <style>
         * {
             margin: 0;
@@ -668,8 +668,7 @@
 <body>
     <main class="page">
         <section class="hero">
-            <div class="hero-badge">Rituel d'équipe hebdomadaire</div>
-            <h1>Qui animera les réunions cette semaine ?</h1>
+            <h1>Qui animera les réunions ?</h1>
             <p class="subtitle">La roue tourne. Le destin parle. Le micro change de main.</p>
         </section>
 
@@ -680,7 +679,6 @@
                         <div class="status-title" id="statusTitle">Prêt pour le tirage</div>
                         <div class="status-text" id="statusText">Coche les présents, puis lance la cérémonie.</div>
                     </div>
-                    <div class="week-pill" id="weekPill">Semaine</div>
                 </div>
 
                 <div class="wheel-container">
@@ -690,7 +688,7 @@
                 </div>
 
                 <button class="spin-button" id="spinBtn" onclick="spin()">Lancer le tirage</button>
-                <div class="ritual" id="ritualText">Que le meilleur facilitateur gagne.</div>
+                <div class="ritual" id="ritualText"></div>
             </div>
 
             <aside class="control-panel">
@@ -731,7 +729,7 @@
 
     <div class="winner-modal" id="winnerModal">
         <div class="winner-content">
-            <div class="winner-kicker">Cette semaine, le micro est pour</div>
+            <div class="winner-kicker">Le micro est pour</div>
             <h2>Notre animateur</h2>
             <div class="winner-name" id="winnerName"></div>
             <div class="winner-quote" id="winnerQuote"></div>
@@ -746,7 +744,7 @@
     <div class="toast" id="toast">Copié !</div>
 
     <script>
-        const defaultNames = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Eric', 'Florent'];
+        const defaultNames = ['Louis', 'Regis', 'Sebastien', 'Guillaume', 'Laurent', 'Adrien', 'Damien', 'Mathieu', 'Florent'];
         const participantEmojis = ['', '', '', '', '', '', '', '', '', '', '', ''];
 
         const wheelColors = [
@@ -841,9 +839,7 @@
             return Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7);
         }
 
-        function updateWeekPill() {
-            document.getElementById('weekPill').textContent = `Semaine ${getWeekNumber()}`;
-        }
+        function updateWeekPill() {}
 
         function createParticles() {
             for (let i = 0; i < 58; i++) {
@@ -1008,7 +1004,7 @@
                 participantMeta.className = 'participant-meta';
                 participantMeta.textContent = activeNames.includes(name)
                     ? `Présent · chance x${nameWeights[name]}`
-                    : 'Absent cette semaine';
+                    : 'Absent';
 
                 main.appendChild(participantName);
                 main.appendChild(participantMeta);
@@ -1131,7 +1127,7 @@
                 showWinner(winner);
                 createConfetti();
 
-                document.getElementById('statusTitle').textContent = `Animateur de la semaine : ${winner}`;
+                document.getElementById('statusTitle').textContent = `Animateur : ${winner}`;
                 document.getElementById('statusText').textContent = lastMission.replace('Mission : ', '');
                 setRitualText('La roue a parlé. Aucun recours possible.');
 
@@ -1194,7 +1190,7 @@
         }
 
         function copyResult() {
-            const message = `Animateur de la semaine : ${lastWinner}\n${lastMission}`;
+            const message = `Animateur : ${lastWinner}\n${lastMission}`;
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(message)
@@ -1257,7 +1253,7 @@
 
         loadState();
         createParticles();
-        updateWeekPill();
+        // updateWeekPill();
         shuffledActiveNames = shuffleArray(activeNames);
         updateNameList();
         drawWheel();
